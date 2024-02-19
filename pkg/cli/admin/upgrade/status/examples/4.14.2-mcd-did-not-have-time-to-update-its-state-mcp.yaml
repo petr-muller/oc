@@ -1,0 +1,162 @@
+apiVersion: v1
+items:
+  - apiVersion: machineconfiguration.openshift.io/v1
+    kind: MachineConfigPool
+    metadata:
+      creationTimestamp: "2024-02-07T16:03:00Z"
+      generation: 5
+      labels:
+        machineconfiguration.openshift.io/mco-built-in: ""
+        operator.machineconfiguration.openshift.io/required-for-upgrade: ""
+        pools.operator.machineconfiguration.openshift.io/master: ""
+      name: master
+      resourceVersion: "97039"
+      uid: d9c888d5-14f1-4bf9-9f7c-9dc7ecfa2c7a
+    spec:
+      configuration:
+        name: rendered-master-90c35d35adce6cb63c738fd10c207da8
+        source:
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 00-master
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 01-master-container-runtime
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 01-master-kubelet
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 97-master-generated-kubelet
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 98-master-generated-kubelet
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 99-master-generated-registries
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 99-master-ssh
+      machineConfigSelector:
+        matchLabels:
+          machineconfiguration.openshift.io/role: master
+      nodeSelector:
+        matchLabels:
+          node-role.kubernetes.io/master: ""
+      paused: false
+    status:
+      conditions:
+        - lastTransitionTime: "2024-02-07T16:03:30Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: RenderDegraded
+        - lastTransitionTime: "2024-02-07T16:06:30Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: NodeDegraded
+        - lastTransitionTime: "2024-02-07T16:06:30Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: Degraded
+        - lastTransitionTime: "2024-02-07T17:50:57Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: Updated
+        - lastTransitionTime: "2024-02-07T17:50:57Z"
+          message: All nodes are updating to MachineConfig rendered-master-90c35d35adce6cb63c738fd10c207da8
+          reason: ""
+          status: "True"
+          type: Updating
+      configuration:
+        name: rendered-master-525f869154e60488dd73d26a2b1dc5e1
+      degradedMachineCount: 0
+      machineCount: 3
+      observedGeneration: 5
+      readyMachineCount: 2
+      unavailableMachineCount: 1
+      updatedMachineCount: 2
+  - apiVersion: machineconfiguration.openshift.io/v1
+    kind: MachineConfigPool
+    metadata:
+      creationTimestamp: "2024-02-07T16:03:00Z"
+      generation: 9
+      labels:
+        machineconfiguration.openshift.io/mco-built-in: ""
+        pools.operator.machineconfiguration.openshift.io/worker: ""
+      name: worker
+      resourceVersion: "95208"
+      uid: 9f08ae73-d4b9-4213-b303-33a3c953fca1
+    spec:
+      configuration:
+        name: rendered-worker-29c9f767aa8bb5652e119b01e83b5b67
+        source:
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 00-worker
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 01-worker-container-runtime
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 01-worker-kubelet
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 97-worker-generated-kubelet
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 98-worker-generated-kubelet
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 99-worker-generated-registries
+          - apiVersion: machineconfiguration.openshift.io/v1
+            kind: MachineConfig
+            name: 99-worker-ssh
+      machineConfigSelector:
+        matchLabels:
+          machineconfiguration.openshift.io/role: worker
+      nodeSelector:
+        matchLabels:
+          node-role.kubernetes.io/worker: ""
+      paused: false
+    status:
+      conditions:
+        - lastTransitionTime: "2024-02-07T16:03:30Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: RenderDegraded
+        - lastTransitionTime: "2024-02-07T16:03:35Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: NodeDegraded
+        - lastTransitionTime: "2024-02-07T16:03:35Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: Degraded
+        - lastTransitionTime: "2024-02-07T18:00:01Z"
+          message: All nodes are updated with MachineConfig rendered-worker-29c9f767aa8bb5652e119b01e83b5b67
+          reason: ""
+          status: "True"
+          type: Updated
+        - lastTransitionTime: "2024-02-07T18:00:01Z"
+          message: ""
+          reason: ""
+          status: "False"
+          type: Updating
+      configuration:
+        name: rendered-worker-29c9f767aa8bb5652e119b01e83b5b67
+      degradedMachineCount: 0
+      machineCount: 3
+      observedGeneration: 9
+      readyMachineCount: 3
+      unavailableMachineCount: 0
+      updatedMachineCount: 3
+kind: List
+metadata:
+  resourceVersion: ""

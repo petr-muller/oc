@@ -1,0 +1,25 @@
+An update is in progress for 31s: Cluster version is 4.14.1
+
+= Control Plane =
+Assessment:      Completed
+Completion:      100%
+Duration:        32m42s
+Operator Status: 33 Total, 33 Available, 0 Progressing, 0 Degraded
+
+= Worker Upgrade =
+
+= Worker Pool =
+Worker Pool:     worker
+Assessment:      Degraded
+Completion:      67%
+Worker Status: 3 Total, 2 Available, 1 Progressing, 1 Outdated, 1 Draining, 0 Excluded, 1 Degraded
+
+Worker Pool Node(s)
+NAME                                        ASSESSMENT   PHASE      VERSION   EST   MESSAGE
+ip-10-0-80-190.us-west-1.compute.internal   Degraded     Draining   4.14.0    ?     failed to drain node: ip-10-0-80-190.us-west-1.compute.internal after 1 hour. Please see machine-config-controller logs for more information
+ip-10-0-13-79.us-west-1.compute.internal    Completed    Updated    4.14.1    -     
+ip-10-0-53-134.us-west-1.compute.internal   Completed    Updated    4.14.1    -     
+
+= Update Health =
+SINCE   LEVEL   IMPACT           MESSAGE
+-       Error   Update Stalled   Node ip-10-0-80-190.us-west-1.compute.internal is degraded | failed to drain node: ip-10-0-80-190.us-west-1.compute.internal after 1 hour. Please see machine-config-controller logs for more information

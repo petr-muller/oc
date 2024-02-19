@@ -1,0 +1,26 @@
+An update is in progress for 50m25s: Working towards 4.14.2: 228 of 860 done (26% complete)
+
+= Control Plane =
+Assessment:      Progressing
+Completion:      97%
+Duration:        50m25s
+Operator Status: 33 Total, 33 Available, 1 Progressing, 0 Degraded
+
+= Worker Upgrade =
+
+= Worker Pool =
+Worker Pool:     worker
+Assessment:      Progressing
+Completion:      75%
+Worker Status: 4 Total, 3 Available, 1 Progressing, 1 Outdated, 1 Draining, 0 Excluded, 0 Degraded
+
+Worker Pool Node(s)
+NAME                                        ASSESSMENT    PHASE      VERSION   EST    MESSAGE
+ip-10-0-53-40.us-east-2.compute.internal    Progressing   Draining   4.14.1    +30m   
+ip-10-0-20-162.us-east-2.compute.internal   Completed     Updated    4.14.2    -      
+ip-10-0-4-159.us-east-2.compute.internal    Completed     Updated    4.14.2    -      
+ip-10-0-99-40.us-east-2.compute.internal    Completed     Updated    4.14.2    -      
+
+= Update Health =
+SINCE    LEVEL   IMPACT   MESSAGE
+50m25s   Info    None     Upgrade is proceeding well

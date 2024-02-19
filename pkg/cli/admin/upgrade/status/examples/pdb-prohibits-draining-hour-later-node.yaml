@@ -1,0 +1,284 @@
+apiVersion: v1
+items:
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      annotations:
+        machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+        machineconfiguration.openshift.io/currentConfig: rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/desiredConfig: rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/desiredDrain: uncordon-rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: "40046"
+        machineconfiguration.openshift.io/reason: ""
+        machineconfiguration.openshift.io/state: Done
+      creationTimestamp: "2024-02-01T15:15:10Z"
+      labels:
+        node-role.kubernetes.io/control-plane: ""
+        node-role.kubernetes.io/master: ""
+      name: ip-10-0-12-249.us-west-1.compute.internal
+      resourceVersion: "77242"
+      uid: d75fb592-1c7e-41a9-a48e-a10f8c92302d
+    spec: {}
+    status:
+      conditions:
+        - lastHeartbeatTime: "2024-02-01T17:11:27Z"
+          lastTransitionTime: "2024-02-01T16:02:55Z"
+          message: kubelet has sufficient memory available
+          reason: KubeletHasSufficientMemory
+          status: "False"
+          type: MemoryPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:27Z"
+          lastTransitionTime: "2024-02-01T16:02:55Z"
+          message: kubelet has no disk pressure
+          reason: KubeletHasNoDiskPressure
+          status: "False"
+          type: DiskPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:27Z"
+          lastTransitionTime: "2024-02-01T16:02:55Z"
+          message: kubelet has sufficient PID available
+          reason: KubeletHasSufficientPID
+          status: "False"
+          type: PIDPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:27Z"
+          lastTransitionTime: "2024-02-01T16:03:16Z"
+          message: kubelet is posting ready status
+          reason: KubeletReady
+          status: "True"
+          type: Ready
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      annotations:
+        machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+        machineconfiguration.openshift.io/currentConfig: rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/desiredConfig: rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/desiredDrain: uncordon-rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: "40046"
+        machineconfiguration.openshift.io/reason: ""
+        machineconfiguration.openshift.io/state: Done
+      creationTimestamp: "2024-02-01T15:15:11Z"
+      labels:
+        node-role.kubernetes.io/control-plane: ""
+        node-role.kubernetes.io/master: ""
+      name: ip-10-0-125-238.us-west-1.compute.internal
+      resourceVersion: "77269"
+      uid: 71152c52-1e23-472d-8515-c80d25884b45
+    spec: {}
+    status:
+      conditions:
+        - lastHeartbeatTime: "2024-02-01T17:11:30Z"
+          lastTransitionTime: "2024-02-01T16:08:20Z"
+          message: kubelet has sufficient memory available
+          reason: KubeletHasSufficientMemory
+          status: "False"
+          type: MemoryPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:30Z"
+          lastTransitionTime: "2024-02-01T16:08:20Z"
+          message: kubelet has no disk pressure
+          reason: KubeletHasNoDiskPressure
+          status: "False"
+          type: DiskPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:30Z"
+          lastTransitionTime: "2024-02-01T16:08:20Z"
+          message: kubelet has sufficient PID available
+          reason: KubeletHasSufficientPID
+          status: "False"
+          type: PIDPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:30Z"
+          lastTransitionTime: "2024-02-01T16:08:52Z"
+          message: kubelet is posting ready status
+          reason: KubeletReady
+          status: "True"
+          type: Ready
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      annotations:
+        machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+        machineconfiguration.openshift.io/currentConfig: rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/desiredConfig: rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/desiredDrain: uncordon-rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: "40046"
+        machineconfiguration.openshift.io/reason: ""
+        machineconfiguration.openshift.io/state: Done
+      creationTimestamp: "2024-02-01T15:22:03Z"
+      labels:
+        machine.openshift.io/interruptible-instance: ""
+        node-role.kubernetes.io/worker: ""
+      name: ip-10-0-13-79.us-west-1.compute.internal
+      resourceVersion: "76850"
+      uid: 110d2859-93cd-4aef-8250-332e4ff08172
+    spec: {}
+    status:
+      conditions:
+        - lastHeartbeatTime: "2024-02-01T17:10:43Z"
+          lastTransitionTime: "2024-02-01T16:00:22Z"
+          message: kubelet has sufficient memory available
+          reason: KubeletHasSufficientMemory
+          status: "False"
+          type: MemoryPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:43Z"
+          lastTransitionTime: "2024-02-01T16:00:22Z"
+          message: kubelet has no disk pressure
+          reason: KubeletHasNoDiskPressure
+          status: "False"
+          type: DiskPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:43Z"
+          lastTransitionTime: "2024-02-01T16:00:22Z"
+          message: kubelet has sufficient PID available
+          reason: KubeletHasSufficientPID
+          status: "False"
+          type: PIDPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:43Z"
+          lastTransitionTime: "2024-02-01T16:00:38Z"
+          message: kubelet is posting ready status
+          reason: KubeletReady
+          status: "True"
+          type: Ready
+      volumesInUse: []
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      annotations:
+        machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+        machineconfiguration.openshift.io/currentConfig: rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/desiredConfig: rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/desiredDrain: uncordon-rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-master-9774a6215d3b1e57660c513ce0b5a630
+        machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: "40046"
+        machineconfiguration.openshift.io/reason: ""
+        machineconfiguration.openshift.io/state: Done
+      creationTimestamp: "2024-02-01T15:15:10Z"
+      labels:
+        node-role.kubernetes.io/control-plane: ""
+        node-role.kubernetes.io/master: ""
+      name: ip-10-0-33-227.us-west-1.compute.internal
+      resourceVersion: "76801"
+      uid: 775d22f4-1068-438b-8d38-7c7448ed6aba
+    spec: {}
+    status:
+      conditions:
+        - lastHeartbeatTime: "2024-02-01T17:10:36Z"
+          lastTransitionTime: "2024-02-01T16:14:09Z"
+          message: kubelet has sufficient memory available
+          reason: KubeletHasSufficientMemory
+          status: "False"
+          type: MemoryPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:36Z"
+          lastTransitionTime: "2024-02-01T16:14:09Z"
+          message: kubelet has no disk pressure
+          reason: KubeletHasNoDiskPressure
+          status: "False"
+          type: DiskPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:36Z"
+          lastTransitionTime: "2024-02-01T16:14:09Z"
+          message: kubelet has sufficient PID available
+          reason: KubeletHasSufficientPID
+          status: "False"
+          type: PIDPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:36Z"
+          lastTransitionTime: "2024-02-01T16:14:30Z"
+          message: kubelet is posting ready status
+          reason: KubeletReady
+          status: "True"
+          type: Ready
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      annotations:
+        machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+        machineconfiguration.openshift.io/currentConfig: rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/desiredConfig: rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/desiredDrain: uncordon-rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: "40046"
+        machineconfiguration.openshift.io/reason: ""
+        machineconfiguration.openshift.io/state: Done
+      creationTimestamp: "2024-02-01T15:22:13Z"
+      labels:
+        machine.openshift.io/interruptible-instance: ""
+        node-role.kubernetes.io/worker: ""
+      name: ip-10-0-53-134.us-west-1.compute.internal
+      resourceVersion: "76821"
+      uid: 6a504677-f803-44ca-b378-7a3fa672cf06
+    spec: {}
+    status:
+      conditions:
+        - lastHeartbeatTime: "2024-02-01T17:10:38Z"
+          lastTransitionTime: "2024-02-01T16:03:36Z"
+          message: kubelet has sufficient memory available
+          reason: KubeletHasSufficientMemory
+          status: "False"
+          type: MemoryPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:38Z"
+          lastTransitionTime: "2024-02-01T16:03:36Z"
+          message: kubelet has no disk pressure
+          reason: KubeletHasNoDiskPressure
+          status: "False"
+          type: DiskPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:38Z"
+          lastTransitionTime: "2024-02-01T16:03:36Z"
+          message: kubelet has sufficient PID available
+          reason: KubeletHasSufficientPID
+          status: "False"
+          type: PIDPressure
+        - lastHeartbeatTime: "2024-02-01T17:10:38Z"
+          lastTransitionTime: "2024-02-01T16:03:52Z"
+          message: kubelet is posting ready status
+          reason: KubeletReady
+          status: "True"
+          type: Ready
+      volumesInUse: []
+  - apiVersion: v1
+    kind: Node
+    metadata:
+      annotations:
+        machineconfiguration.openshift.io/controlPlaneTopology: HighlyAvailable
+        machineconfiguration.openshift.io/currentConfig: rendered-worker-9353e33e7f147b278b22ed51d3568fb4
+        machineconfiguration.openshift.io/desiredConfig: rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/desiredDrain: drain-rendered-worker-31499785dd9a89db14a671d0ac7aec12
+        machineconfiguration.openshift.io/lastAppliedDrain: uncordon-rendered-worker-9353e33e7f147b278b22ed51d3568fb4
+        machineconfiguration.openshift.io/lastSyncedControllerConfigResourceVersion: "40046"
+        machineconfiguration.openshift.io/reason: 'failed to drain node: ip-10-0-80-190.us-west-1.compute.internal after 1 hour. Please see machine-config-controller logs for more information'
+        machineconfiguration.openshift.io/state: Degraded
+      creationTimestamp: "2024-02-01T15:22:14Z"
+      labels:
+        machine.openshift.io/interruptible-instance: ""
+        node-role.kubernetes.io/worker: ""
+      name: ip-10-0-80-190.us-west-1.compute.internal
+      resourceVersion: "77034"
+      uid: a4386422-1d08-4905-b024-9e9691696169
+    spec:
+      unschedulable: true
+    status:
+      conditions:
+        - lastHeartbeatTime: "2024-02-01T17:11:06Z"
+          lastTransitionTime: "2024-02-01T15:22:14Z"
+          message: kubelet has sufficient memory available
+          reason: KubeletHasSufficientMemory
+          status: "False"
+          type: MemoryPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:06Z"
+          lastTransitionTime: "2024-02-01T15:22:14Z"
+          message: kubelet has no disk pressure
+          reason: KubeletHasNoDiskPressure
+          status: "False"
+          type: DiskPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:06Z"
+          lastTransitionTime: "2024-02-01T15:22:14Z"
+          message: kubelet has sufficient PID available
+          reason: KubeletHasSufficientPID
+          status: "False"
+          type: PIDPressure
+        - lastHeartbeatTime: "2024-02-01T17:11:06Z"
+          lastTransitionTime: "2024-02-01T15:23:00Z"
+          message: kubelet is posting ready status
+          reason: KubeletReady
+          status: "True"
+          type: Ready
+kind: List
+metadata:
+  resourceVersion: ""

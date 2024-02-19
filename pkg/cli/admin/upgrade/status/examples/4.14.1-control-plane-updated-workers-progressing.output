@@ -1,0 +1,25 @@
+An update is in progress for 2m58s: Cluster version is 4.14.1
+
+= Control Plane =
+Assessment:      Completed
+Completion:      100%
+Duration:        32m0s
+Operator Status: 33 Total, 33 Available, 0 Progressing, 0 Degraded
+
+= Worker Upgrade =
+
+= Worker Pool =
+Worker Pool:     worker
+Assessment:      Progressing
+Completion:      67%
+Worker Status: 3 Total, 2 Available, 1 Progressing, 1 Outdated, 0 Draining, 0 Excluded, 0 Degraded
+
+Worker Pool Node(s)
+NAME                                        ASSESSMENT    PHASE      VERSION   EST    MESSAGE
+ip-10-0-99-40.us-east-2.compute.internal    Progressing   Updating   4.14.0    +20m   
+ip-10-0-20-162.us-east-2.compute.internal   Completed     Updated    4.14.1    -      
+ip-10-0-4-159.us-east-2.compute.internal    Completed     Updated    4.14.1    -      
+
+= Update Health =
+SINCE   LEVEL   IMPACT   MESSAGE
+2m58s   Info    None     Upgrade is proceeding well
