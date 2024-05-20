@@ -174,7 +174,7 @@ func shortDuration(d time.Duration) string {
 	switch {
 	case orig == "0h0m0s":
 		return "now"
-	case strings.HasSuffix(orig, "0m0s"):
+	case strings.HasSuffix(orig, "h0m0s"):
 		return orig[:len(orig)-4]
 	case strings.HasSuffix(orig, "m0s"):
 		return orig[:len(orig)-2]
