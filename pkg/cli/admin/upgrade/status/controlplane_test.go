@@ -303,7 +303,7 @@ func TestAssessControlPlaneStatus_Completion(t *testing.T) {
 }
 
 func TestAssessControlPlaneStatus_Duration(t *testing.T) {
-	// Inject ns skew to exerise expected rounding
+	// Inject ns skew to exercise expected rounding
 	nsSkew := 12315 * time.Nanosecond
 
 	now := time.Now()
@@ -866,6 +866,39 @@ func Test_versionsFromHistory(t *testing.T) {
 
 			if diff := cmp.Diff(tt.expectedUpdateInsights, actualInsights, allowUnexportedInsightStructs); diff != "" {
 				t.Errorf("updateInsight differ from expected:\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestEstimateCompletion(t *testing.T) {
+	now := time.Now()
+
+	testCases := []struct {
+		name string
+
+		started time.Time
+		now     time.Time
+
+		expectedEstimateFinish         time.Time
+		expectedEstimateTimeToComplete time.Duration
+	}{
+		{
+			name:                           "baseline is 60m: after 20m expect 40m to go",
+			started:                        now.Add(-20 * time.Minute),
+			now:                            now,
+			expectedEstimateFinish:         now.Add(40 * time.Minute),
+			expectedEstimateTimeToComplete: 40 * time.Minute,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			estimateFinish, estimateTimeToComplete := estimateCompletion(tc.started, tc.now)
+			if diff := cmp.Diff(tc.expectedEstimateFinish, estimateFinish); diff != "" {
+				t.Errorf("estimate finish differs from expected:\n%s", diff)
+			}
+			if diff := cmp.Diff(tc.expectedEstimateTimeToComplete, estimateTimeToComplete); diff != "" {
+				t.Errorf("estimate time to complete differs from expected:\n%s", diff)
 			}
 		})
 	}
