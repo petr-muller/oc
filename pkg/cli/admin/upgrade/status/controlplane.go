@@ -163,6 +163,7 @@ func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOpera
 		insights = append(insights, insight)
 	}
 
+	var lastObservedProgress time.Time
 	for _, operator := range operators {
 		var isPlatformOperator bool
 		for annotation := range operator.Annotations {
@@ -176,14 +177,21 @@ func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOpera
 			continue
 		}
 
+		var updated bool
 		for _, version := range operator.Status.Versions {
 			if version.Name == "operator" && version.Version == targetVersion {
-				completed++
+				updated = true
 				break
 			}
 		}
+
+		if updated {
+			completed++
+		}
+
 		var available *v1.ClusterOperatorStatusCondition
 		var degraded *v1.ClusterOperatorStatusCondition
+		var progressing *v1.ClusterOperatorStatusCondition
 
 		displayData.Operators.Total++
 		for _, condition := range operator.Status.Conditions {
@@ -193,6 +201,16 @@ func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOpera
 				available = &condition
 			case condition.Type == v1.OperatorDegraded:
 				degraded = &condition
+			case condition.Type == v1.OperatorProgressing:
+				progressing = &condition
+			}
+		}
+
+		if progressing != nil {
+			if progressing.Status == v1.ConditionTrue && !updated || progressing.Status == v1.ConditionFalse && updated {
+				if progressing.LastTransitionTime.After(lastObservedProgress) {
+					lastObservedProgress = progressing.LastTransitionTime.Time
+				}
 			}
 		}
 
