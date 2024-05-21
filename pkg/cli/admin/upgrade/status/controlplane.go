@@ -125,6 +125,15 @@ func coInsights(name string, available *v1.ClusterOperatorStatusCondition, degra
 	return insights
 }
 
+func getLastObservedProgress(current time.Time, progressing *v1.ClusterOperatorStatusCondition, updated bool) time.Time {
+	if progressing.Status == v1.ConditionTrue && !updated || progressing.Status == v1.ConditionFalse && updated {
+		if progressing.LastTransitionTime.After(current) {
+			return progressing.LastTransitionTime.Time
+		}
+	}
+	return current
+}
+
 func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOperator, at time.Time) (controlPlaneStatusDisplayData, []updateInsight) {
 	var displayData controlPlaneStatusDisplayData
 	var completed int
@@ -163,7 +172,7 @@ func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOpera
 		insights = append(insights, insight)
 	}
 
-	var lastObservedProgress time.Time
+	lastObservedProgress := at
 	for _, operator := range operators {
 		var isPlatformOperator bool
 		for annotation := range operator.Annotations {
@@ -207,11 +216,7 @@ func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOpera
 		}
 
 		if progressing != nil {
-			if progressing.Status == v1.ConditionTrue && !updated || progressing.Status == v1.ConditionFalse && updated {
-				if progressing.LastTransitionTime.After(lastObservedProgress) {
-					lastObservedProgress = progressing.LastTransitionTime.Time
-				}
-			}
+			lastObservedProgress = getLastObservedProgress(lastObservedProgress, progressing, updated)
 		}
 
 		if available == nil || available.Status != v1.ConditionTrue {

@@ -370,6 +370,149 @@ func TestAssessControlPlaneStatus_Duration(t *testing.T) {
 	}
 }
 
+func TestGetLastObservedProgress(t *testing.T) {
+	now := time.Now()
+	start := now.Add(-30 * time.Minute)
+
+	type operator struct {
+		progressing        bool
+		lastTransitionTime metav1.Time
+		updated            bool
+	}
+
+	testCases := []struct {
+		name      string
+		operators []operator
+		expected  time.Time
+	}{
+		{
+			name: "no updated operators, no outdated operators are progressing -> initial time",
+			operators: []operator{
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(5 * time.Minute)), updated: false},
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(10 * time.Minute)), updated: false},
+			},
+			expected: start,
+		},
+		{
+			name: "updated operators progressing, no outdated operators are progressing -> initial time",
+			operators: []operator{
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(2 * time.Minute)), updated: false},
+				{progressing: true, lastTransitionTime: metav1.NewTime(start.Add(6 * time.Minute)), updated: true},
+			},
+			expected: start,
+		},
+		{
+			name: "latest outdated progressing operator",
+			operators: []operator{
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(2 * time.Minute)), updated: false},
+				{progressing: true, lastTransitionTime: metav1.NewTime(start.Add(6 * time.Minute)), updated: false},
+				{progressing: true, lastTransitionTime: metav1.NewTime(start.Add(8 * time.Minute)), updated: true},
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(10 * time.Minute)), updated: false},
+			},
+			expected: start.Add(6 * time.Minute),
+		},
+		{
+			name: "latest updated not progressing operator",
+			operators: []operator{
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(2 * time.Minute)), updated: false},
+				{progressing: true, lastTransitionTime: metav1.NewTime(start.Add(6 * time.Minute)), updated: false},
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(8 * time.Minute)), updated: true},
+				{progressing: false, lastTransitionTime: metav1.NewTime(start.Add(10 * time.Minute)), updated: false},
+			},
+			expected: start.Add(8 * time.Minute),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			lastObservedProgress := start
+			for _, item := range tc.operators {
+				progressing := configv1.ConditionFalse
+				if item.progressing {
+					progressing = configv1.ConditionTrue
+				}
+
+				condition := &configv1.ClusterOperatorStatusCondition{
+					Type:               configv1.OperatorProgressing,
+					Status:             progressing,
+					LastTransitionTime: item.lastTransitionTime,
+				}
+				lastObservedProgress = getLastObservedProgress(lastObservedProgress, condition, item.updated)
+			}
+			if diff := cmp.Diff(tc.expected, lastObservedProgress); diff != "" {
+				t.Errorf("last observed progress differs from expected:\n%s", diff)
+			}
+		})
+	}
+
+}
+
+// Precise estimation is tested in TestEstimateCompletion, here we test a high-level
+// invariant that estimate is equal for different "last observed progress" sources
+// in otherwise identical update scenarios:
+//
+func TestAssessControlPlaneStatus_Estimation(t *testing.T) {
+	now := time.Now()
+	hourAgo := metav1.NewTime(now.Add(-time.Hour))
+
+	testCases := []struct {
+		name             string
+		operators        []configv1.ClusterOperator
+	}{
+		{
+			name:             "",
+			firstHistoryItem:,
+			expectedDuration: time.Hour,
+		},
+		{
+			name: "completed upgrade",
+			firstHistoryItem: configv1.UpdateHistory{
+				State:          configv1.CompletedUpdate,
+				StartedTime:    hourAgo,
+				CompletionTime: &halfHourAgo,
+				Version:        "new",
+			},
+			expectedDuration: 30 * time.Minute,
+		},
+		{
+			name: "partial update started 10s ago -> 10s duration",
+			firstHistoryItem: configv1.UpdateHistory{
+				State:       configv1.PartialUpdate,
+				StartedTime: underTenMinutesAgo,
+				Version:     "new",
+			},
+			expectedDuration: 333 * time.Second, // precision to seconds when under 10m
+		},
+		{
+			name: "partial update started over 10m ago ago -> 11m duration",
+			firstHistoryItem: configv1.UpdateHistory{
+				State:       configv1.PartialUpdate,
+				StartedTime: overTenMinutesAgo,
+				Version:     "new",
+			},
+			expectedDuration: 11 * time.Minute, // rounded to minutes when over 10m
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			cv := cvFixture.DeepCopy()
+			cv.Status.History = append(cv.Status.History,
+				configv1.UpdateHistory{
+					State:       configv1.PartialUpdate,
+					StartedTime: hourAgo,
+					Version:     "new",
+				})
+
+			actual, _ := assessControlPlaneStatus(cv, nil, now)
+			if diff := cmp.Diff(tc.expectedDuration, actual.Duration); diff != "" {
+				t.Errorf("expected completion %s, got %s", tc.expectedDuration, actual.Duration)
+			}
+		})
+	}
+}
+
 func TestCoInsights(t *testing.T) {
 	t.Parallel()
 	anchorTime := time.Now()
