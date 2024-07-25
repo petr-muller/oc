@@ -1,0 +1,20 @@
+apiVersion: config.openshift.io/v1alpha1
+kind: UpdateStatus
+metadata:
+  name: cluster
+spec: {}
+status:
+  controlPlane:
+    assessment: Progressing
+    completion: 0
+    conditions:
+    - lastTransitionTime: "2023-11-03T15:28:04Z"
+      message: 'Unable to apply 4.14.1: wait has exceeded 40 minutes for these operators:
+      etcd, kube-apiserver'
+      reason: ClusterVersionProgressing
+      status: "True"
+      type: UpdateProgressing
+    startedAt: "2023-11-03T15:28:04Z"
+    versions:
+      original: 4.14.0-rc.3
+      target: 4.14.1

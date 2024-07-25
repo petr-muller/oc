@@ -1,0 +1,48 @@
+= Control Plane =
+Assessment:      Completed
+Target Version:  4.16.0-ec.3 (from 4.16.0-ec.2)
+Completion:      100%
+Duration:        3h31m
+Operator Status: 35 Healthy, 1 Available but degraded
+
+Control Plane Nodes
+NAME                                                  ASSESSMENT   PHASE     VERSION       EST   MESSAGE
+build0-gstfj-m-0.c.openshift-ci-build-farm.internal   Completed    Updated   4.16.0-ec.3   -     
+build0-gstfj-m-1.c.openshift-ci-build-farm.internal   Completed    Updated   4.16.0-ec.3   -     
+build0-gstfj-m-2.c.openshift-ci-build-farm.internal   Completed    Updated   4.16.0-ec.3   -     
+
+= Worker Upgrade =
+
+WORKER POOL   ASSESSMENT   COMPLETION   STATUS
+worker        Degraded     39%          59 Total, 45 Available, 5 Progressing, 36 Outdated, 12 Draining, 0 Excluded, 7 Degraded
+
+Worker Pool Nodes: worker
+NAME                                      ASSESSMENT    PHASE      VERSION       EST    MESSAGE
+build0-gstfj-ci-prowjobs-worker-b-9lztv   Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-prowjobs-worker-b-bg9f5   Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-prowjobs-worker-b-mrxwn   Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-tests-worker-b-4h7pn      Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-tests-worker-b-jv5bg      Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-tests-worker-b-kj6gk      Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-tests-worker-c-dcz9p      Degraded      Draining   4.16.0-ec.2   ?      failed to drain node: <node> after 1 hour. Please see machine-config-controller logs for more information
+build0-gstfj-ci-prowjobs-worker-d-ddnxd   Unavailable   Pending    ?             ?      Node is unavailable
+build0-gstfj-ci-tests-worker-c-jq5rk      Unavailable   Updated    4.16.0-ec.3   -      Node is unavailable
+build0-gstfj-ci-tests-worker-c-2kz4m      Progressing   Draining   4.16.0-ec.2   +10m   
+...
+Omitted additional 49 Total, 22 Completed, 45 Available, 4 Progressing, 27 Outdated, 4 Draining, 0 Excluded, and 0 Degraded nodes.
+Pass along --details=nodes to see all information.
+
+= Update Health =
+SINCE   LEVEL     IMPACT           MESSAGE
+-       Error     Update Stalled   Node build0-gstfj-ci-prowjobs-worker-b-9lztv is degraded
+-       Error     Update Stalled   Node build0-gstfj-ci-prowjobs-worker-b-bg9f5 is degraded
+-       Error     Update Stalled   Node build0-gstfj-ci-prowjobs-worker-b-mrxwn is degraded
+-       Error     Update Stalled   Node build0-gstfj-ci-tests-worker-b-4h7pn is degraded
+-       Error     Update Stalled   Node build0-gstfj-ci-tests-worker-b-jv5bg is degraded
+-       Error     Update Stalled   Node build0-gstfj-ci-tests-worker-b-kj6gk is degraded
+-       Error     Update Stalled   Node build0-gstfj-ci-tests-worker-c-dcz9p is degraded
+now     Warning   Update Stalled   Cluster Version version is failing to proceed with the update (ClusterOperatorDegraded)
+-       Warning   Update Speed     Node build0-gstfj-ci-prowjobs-worker-d-ddnxd is unavailable
+-       Warning   Update Speed     Node build0-gstfj-ci-tests-worker-c-jq5rk is unavailable
+
+Run with --details=health for additional description and links to related online documentation

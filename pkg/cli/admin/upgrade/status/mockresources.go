@@ -5,6 +5,7 @@ import (
 	"os"
 
 	configv1 "github.com/openshift/api/config/v1"
+	configv1alpha1 "github.com/openshift/api/config/v1alpha1"
 	machineconfigv1 "github.com/openshift/api/machineconfiguration/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -18,11 +19,13 @@ type mockData struct {
 	machineConfigsPath     string
 	nodesPath              string
 	alertsPath             string
+	updateStatusPath       string
 	clusterVersion         *configv1.ClusterVersion
 	clusterOperators       *configv1.ClusterOperatorList
 	machineConfigPools     *machineconfigv1.MachineConfigPoolList
 	machineConfigs         *machineconfigv1.MachineConfigList
 	nodes                  *corev1.NodeList
+	updateStatus           *configv1alpha1.UpdateStatus
 }
 
 func asResourceList[T any](objects *corev1.List, decoder runtime.Decoder) ([]T, error) {
@@ -53,7 +56,10 @@ func (o *mockData) load() error {
 	if err := machineconfigv1.Install(scheme); err != nil {
 		return err
 	}
-	decoder := codecs.UniversalDecoder(configv1.GroupVersion, corev1.SchemeGroupVersion, machineconfigv1.GroupVersion)
+	if err := configv1alpha1.Install(scheme); err != nil {
+		return err
+	}
+	decoder := codecs.UniversalDecoder(configv1.GroupVersion, corev1.SchemeGroupVersion, machineconfigv1.GroupVersion, configv1alpha1.GroupVersion)
 
 	cvBytes, err := os.ReadFile(o.cvPath)
 	if err != nil {
@@ -76,6 +82,31 @@ func (o *mockData) load() error {
 		o.clusterVersion = &cvs[0]
 	default:
 		return fmt.Errorf("unexpected object type %T in --mock-clusterversion=%s content", cvObj, o.cvPath)
+	}
+
+	if o.updateStatusPath != "" {
+		usBytes, err := os.ReadFile(o.updateStatusPath)
+		if err != nil {
+			return err
+		}
+		usObj, err := runtime.Decode(decoder, usBytes)
+		if err != nil {
+			return err
+		}
+		switch usObj := usObj.(type) {
+		case *configv1alpha1.UpdateStatus:
+			o.updateStatus = usObj
+		case *configv1alpha1.UpdateStatusList:
+			o.updateStatus = &usObj.Items[0]
+		case *corev1.List:
+			uss, err := asResourceList[configv1alpha1.UpdateStatus](usObj, decoder)
+			if err != nil {
+				return fmt.Errorf("error while parsing file %s: %w", o.updateStatusPath, err)
+			}
+			o.updateStatus = &uss[0]
+		default:
+			return fmt.Errorf("unexpected object type %T in --mock-updatestatus=%s content", usObj, o.updateStatusPath)
+		}
 	}
 
 	coListBytes, err := os.ReadFile(o.operatorsPath)

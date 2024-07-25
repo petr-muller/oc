@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	configv1alpha1 "github.com/openshift/api/config/v1alpha1"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -24,6 +25,7 @@ import (
 	machineconfigv1 "github.com/openshift/api/machineconfiguration/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	configv1client "github.com/openshift/client-go/config/clientset/versioned"
+	configv1alpha1client "github.com/openshift/client-go/config/clientset/versioned/typed/config/v1alpha1"
 	machineconfigv1client "github.com/openshift/client-go/machineconfiguration/clientset/versioned"
 	routev1client "github.com/openshift/client-go/route/clientset/versioned/typed/route/v1"
 	"github.com/openshift/oc/pkg/cli/admin/inspectalerts"
@@ -62,6 +64,8 @@ func New(f kcmdutil.Factory, streams genericiooptions.IOStreams) *cobra.Command 
 	flags.StringVar(&o.mockData.cvPath, "mock-clusterversion", "", "Path to a YAML ClusterVersion object to use for testing (will be removed later). Files in the same directory with the same name and suffixes -co.yaml, -mcp.yaml, -mc.yaml, and -node.yaml are required.")
 	flags.StringVar(&o.detailedOutput, "details", "none", fmt.Sprintf("Show detailed output in selected section. One of: %s", strings.Join(detailedOutputAllValues, ", ")))
 
+	flags.BoolVar(&o.statusApi, "status-api", true, "Use status API")
+
 	return cmd
 }
 
@@ -71,11 +75,14 @@ type options struct {
 	mockData       mockData
 	detailedOutput string
 
-	ConfigClient        configv1client.Interface
-	CoreClient          corev1client.CoreV1Interface
-	MachineConfigClient machineconfigv1client.Interface
-	RouteClient         routev1client.RouteV1Interface
-	getAlerts           func(ctx context.Context) ([]byte, error)
+	statusApi bool
+
+	ConfigClient         configv1client.Interface
+	ConfigV1Alpha1Client configv1alpha1client.ConfigV1alpha1Interface
+	CoreClient           corev1client.CoreV1Interface
+	MachineConfigClient  machineconfigv1client.Interface
+	RouteClient          routev1client.RouteV1Interface
+	getAlerts            func(ctx context.Context) ([]byte, error)
 }
 
 func (o *options) enabledDetailed(what string) bool {
@@ -98,6 +105,10 @@ func (o *options) Complete(f kcmdutil.Factory, cmd *cobra.Command, args []string
 		o.mockData.machineConfigsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-mc.yaml", 1)
 		o.mockData.nodesPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-node.yaml", 1)
 		o.mockData.alertsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-alerts.json", 1)
+
+		if o.statusApi {
+			o.mockData.updateStatusPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-us.yaml", 1)
+		}
 	}
 
 	if o.mockData.cvPath == "" {
@@ -110,6 +121,10 @@ func (o *options) Complete(f kcmdutil.Factory, cmd *cobra.Command, args []string
 			return err
 		}
 		o.ConfigClient = configClient
+
+		configv1Alpha1Client := configv1alpha1client.NewForConfigOrDie(cfg)
+		o.ConfigV1Alpha1Client = configv1Alpha1Client
+
 		machineConfigClient, err := machineconfigv1client.NewForConfig(cfg)
 		if err != nil {
 			return err
@@ -166,6 +181,21 @@ func (o *options) Run(ctx context.Context) error {
 		}
 	}
 
+	var us *configv1alpha1.UpdateStatus
+	if us = o.mockData.updateStatus; o.statusApi && us == nil {
+		var err error
+		us, err = o.ConfigV1Alpha1Client.UpdateStatuses().Get(ctx, "cluster", metav1.GetOptions{})
+		if err != nil {
+			if apierrors.IsNotFound(err) {
+				return fmt.Errorf("no update status information available - you must be connected to an OpenShift version 4 server to fetch the current version")
+			}
+			return err
+		}
+	}
+	if o.statusApi && us == nil {
+		return fmt.Errorf("status API usage enabled but UpdateStatus resource is missing")
+	}
+
 	var operators *configv1.ClusterOperatorList
 	if operators = o.mockData.clusterOperators; operators == nil {
 		var err error
@@ -185,11 +215,6 @@ func (o *options) Run(ctx context.Context) error {
 	}
 	if len(operators.Items) == 0 {
 		return fmt.Errorf("no cluster operator information available - you must be connected to an OpenShift version 4 server")
-	}
-
-	progressing := findClusterOperatorStatusCondition(cv.Status.Conditions, configv1.OperatorProgressing)
-	if progressing == nil {
-		return fmt.Errorf("no current %s info, see `oc describe clusterversion` for more details.\n", configv1.OperatorProgressing)
 	}
 
 	var pools *machineconfigv1.MachineConfigPoolList
@@ -275,15 +300,29 @@ func (o *options) Run(ctx context.Context) error {
 		}
 	}
 
-	if progressing.Status != configv1.ConditionTrue && !isWorkerPoolOutdated {
+	var controlPlaneUpdating bool
+	var startedAt time.Time
+
+	if o.statusApi {
+		controlPlaneUpdateProgressing := findCondition(us.Status.ControlPlane.Conditions, "UpdateProgressing")
+		controlPlaneUpdating = controlPlaneUpdateProgressing != nil && controlPlaneUpdateProgressing.Status == metav1.ConditionTrue
+		startedAt = us.Status.ControlPlane.StartedAt.Time
+	} else {
+		progressing := findClusterOperatorStatusCondition(cv.Status.Conditions, configv1.OperatorProgressing)
+		if progressing == nil {
+			return fmt.Errorf("no current %s info, see `oc describe clusterversion` for more details.\n", configv1.OperatorProgressing)
+		}
+		controlPlaneUpdating = progressing.Status == configv1.ConditionTrue
+		startedAt = progressing.LastTransitionTime.Time
+		if len(cv.Status.History) > 0 {
+			startedAt = cv.Status.History[0].StartedTime.Time
+		}
+	}
+	if !controlPlaneUpdating && !isWorkerPoolOutdated {
 		fmt.Fprintf(o.Out, "The cluster is not updating.\n")
 		return nil
 	}
 
-	startedAt := progressing.LastTransitionTime.Time
-	if len(cv.Status.History) > 0 {
-		startedAt = cv.Status.History[0].StartedTime.Time
-	}
 	updatingFor := now.Sub(startedAt).Round(time.Second)
 
 	// get the alerts for the cluster. if we're unable to fetch the alerts, we'll let the user know that alerts
@@ -324,6 +363,15 @@ func (o *options) Run(ctx context.Context) error {
 }
 
 func findClusterOperatorStatusCondition(conditions []configv1.ClusterOperatorStatusCondition, name configv1.ClusterStatusConditionType) *configv1.ClusterOperatorStatusCondition {
+	for i := range conditions {
+		if conditions[i].Type == name {
+			return &conditions[i]
+		}
+	}
+	return nil
+}
+
+func findCondition(conditions []metav1.Condition, name string) *metav1.Condition {
 	for i := range conditions {
 		if conditions[i].Type == name {
 			return &conditions[i]

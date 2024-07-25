@@ -1,0 +1,20 @@
+apiVersion: config.openshift.io/v1alpha1
+kind: UpdateStatus
+metadata:
+  name: cluster
+spec: {}
+status:
+  controlPlane:
+    assessment: Progressing
+    completion: 0
+    conditions:
+    - lastTransitionTime: "2024-02-07T16:31:03Z"
+      message: 'Working towards 4.14.1: 734 of 859 done (85% complete), waiting on
+        machine-config'
+      reason: ClusterVersionProgressing
+      status: "True"
+      type: UpdateProgressing
+    startedAt: "2024-02-07T16:31:03Z"
+    versions:
+      original: 4.14.9
+      target: 4.14.1

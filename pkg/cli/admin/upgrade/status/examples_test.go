@@ -46,6 +46,7 @@ func TestExamples(t *testing.T) {
 	variants := []struct {
 		name         string
 		detailed     string
+		statusApi    bool
 		outputSuffix string
 	}{
 		{
@@ -58,6 +59,18 @@ func TestExamples(t *testing.T) {
 			detailed:     "all",
 			outputSuffix: ".detailed-output",
 		},
+		{
+			name:         "normal output with status API",
+			detailed:     "none",
+			statusApi:    true,
+			outputSuffix: ".statusapi-output",
+		},
+		{
+			name:         "detailed output with status API",
+			detailed:     "all",
+			statusApi:    true,
+			outputSuffix: ".statusapi-detailed-output",
+		},
 	}
 
 	for _, cv := range cvs {
@@ -69,6 +82,7 @@ func TestExamples(t *testing.T) {
 				opts := &options{
 					mockData:       mockData{cvPath: cv},
 					detailedOutput: variant.detailed,
+					statusApi:      variant.statusApi,
 				}
 				if err := opts.Complete(nil, nil, nil); err != nil {
 					t.Fatalf("Error when completing options: %v", err)

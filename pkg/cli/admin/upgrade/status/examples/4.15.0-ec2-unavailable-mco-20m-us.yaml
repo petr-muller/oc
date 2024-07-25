@@ -1,0 +1,20 @@
+apiVersion: config.openshift.io/v1alpha1
+kind: UpdateStatus
+metadata:
+  name: cluster
+spec: {}
+status:
+  controlPlane:
+    assessment: Progressing
+    completion: 0
+    conditions:
+    - lastTransitionTime: "2023-11-24T14:49:35Z"
+      message: 'Working towards 4.15.0-ec.2: 110 of 863 done (12% complete), waiting
+      up to 40 minutes on etcd'
+      reason: ClusterVersionProgressing
+      status: "True"
+      type: UpdateProgressing
+    startedAt: "2023-11-24T14:49:35Z"
+    versions:
+      original: 4.14.0-rc.3
+      target: 4.15.0-ec.2
