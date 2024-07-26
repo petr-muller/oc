@@ -1,33 +1,14 @@
 = Control Plane =
-Assessment:      Progressing - Slow
+Assessment:      Progressing
 Target Version:  4.15.0-ec.2 (from 4.14.0-rc.3)
-Completion:      97%
-Duration:        59m (Est. Time Remaining: <10m)
-Operator Status: 30 Healthy, 2 Unavailable, 1 Available but degraded
-
-Control Plane Nodes
-NAME                                        ASSESSMENT   PHASE     VERSION       EST   MESSAGE
-ip-10-0-30-217.us-east-2.compute.internal   Outdated     Pending   4.14.0-rc.3   ?     
-ip-10-0-53-40.us-east-2.compute.internal    Outdated     Pending   4.14.0-rc.3   ?     
-ip-10-0-92-180.us-east-2.compute.internal   Outdated     Pending   4.14.0-rc.3   ?     
+Completion:      0%
+Duration:        now
+Operator Status: 0 Healthy
 
 = Worker Upgrade =
 
 WORKER POOL   ASSESSMENT   COMPLETION   STATUS
-worker        Pending      0%           3 Total, 3 Available, 0 Progressing, 3 Outdated, 0 Draining, 0 Excluded, 0 Degraded
-
-Worker Pool Nodes: worker
-NAME                                        ASSESSMENT   PHASE     VERSION       EST   MESSAGE
-ip-10-0-20-162.us-east-2.compute.internal   Outdated     Pending   4.14.0-rc.3   ?     
-ip-10-0-4-159.us-east-2.compute.internal    Outdated     Pending   4.14.0-rc.3   ?     
-ip-10-0-99-40.us-east-2.compute.internal    Outdated     Pending   4.14.0-rc.3   ?     
 
 = Update Health =
-SINCE      LEVEL     IMPACT             MESSAGE
-20m24s     Error     API Availability   Cluster Operator machine-config is unavailable (MachineConfigControllerFailed)
-6m35s      Warning   Unknown            Alert is firing: Pod has been in a non-ready state for more than 15 minutes.
-16m35s     Warning   Unknown            Alert is firing: This alert has a message, description, runbook and summary
-24h8m54s   Warning   Unknown            Alert is firing: PodDisruptionBudgetAtLimit for pods <>
-24h8m54s   Warning   Unknown            Alert is firing: PodDisruptionBudgetAtLimit for some reason does not have runbook and description
-
-Run with --details=health for additional description and links to related online documentation
+SINCE   LEVEL   IMPACT   MESSAGE
+now     Info    None     Update is proceeding well

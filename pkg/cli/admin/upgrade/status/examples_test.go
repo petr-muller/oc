@@ -79,8 +79,19 @@ func TestExamples(t *testing.T) {
 			variant := variant
 			t.Run(fmt.Sprintf("%s-%s", cv, variant.name), func(t *testing.T) {
 				t.Parallel()
+				md := mockData{
+					cvPath:           cv,
+					updateStatusPath: strings.Replace(cv, "-cv.yaml", "-us.yaml", 1),
+				}
+
+				if variant.statusApi {
+					md.cvPath = ""
+				} else {
+					md.updateStatusPath = ""
+				}
+
 				opts := &options{
-					mockData:       mockData{cvPath: cv},
+					mockData:       md,
 					detailedOutput: variant.detailed,
 					statusApi:      variant.statusApi,
 				}

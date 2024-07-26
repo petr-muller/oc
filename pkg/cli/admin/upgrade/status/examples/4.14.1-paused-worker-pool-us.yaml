@@ -16,5 +16,5 @@ status:
       type: UpdateProgressing
     startedAt: "2024-02-07T16:31:03Z"
     versions:
-      original: 4.14.0
+      previous: 4.14.0
       target: 4.14.1

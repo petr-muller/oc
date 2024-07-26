@@ -16,6 +16,6 @@ status:
       type: UpdateProgressing
     startedAt: "2023-11-21T15:02:46Z"
     versions:
-      original: 4.14.1
+      previous: 4.14.1
       target: 4.15.0-ec.2
-      previousIncomplete: true
+      previousPartial: true

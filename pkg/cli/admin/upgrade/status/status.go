@@ -61,9 +61,11 @@ func New(f kcmdutil.Factory, streams genericiooptions.IOStreams) *cobra.Command 
 	flags := cmd.Flags()
 	// TODO: We can remove these flags once the idea about `oc adm upgrade status` stabilizes and the command
 	//       is promoted out of the OC_ENABLE_CMD_UPGRADE_STATUS feature gate
-	flags.StringVar(&o.mockData.cvPath, "mock-clusterversion", "", "Path to a YAML ClusterVersion object to use for testing (will be removed later). Files in the same directory with the same name and suffixes -co.yaml, -mcp.yaml, -mc.yaml, and -node.yaml are required.")
+	flags.StringVar(&o.mockData.cvPath, "mock-clusterversion", "", "Path to a YAML ClusterVersion object to use for testing (will be removed later). Files in the same directory with the same name and suffixes -co.yaml, -mcp.yaml, -mc.yaml, and -node.yaml are required. Should be only used with --status-api=false.")
+
 	flags.StringVar(&o.detailedOutput, "details", "none", fmt.Sprintf("Show detailed output in selected section. One of: %s", strings.Join(detailedOutputAllValues, ", ")))
 
+	flags.StringVar(&o.mockData.updateStatusPath, "mock-updatestatus", "", "Path to a YAML UpdateStatus object to use for testing. Should only be used with --status-api=true.")
 	flags.BoolVar(&o.statusApi, "status-api", true, "Use status API")
 
 	return cmd
@@ -98,58 +100,68 @@ func (o *options) Complete(f kcmdutil.Factory, cmd *cobra.Command, args []string
 		return fmt.Errorf("invalid value for --details: %s (must be one of %s)", o.detailedOutput, strings.Join(detailedOutputAllValues, ", "))
 	}
 
-	cvSuffix := "-cv.yaml"
 	if o.mockData.cvPath != "" {
-		o.mockData.operatorsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-co.yaml", 1)
-		o.mockData.machineConfigPoolsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-mcp.yaml", 1)
-		o.mockData.machineConfigsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-mc.yaml", 1)
-		o.mockData.nodesPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-node.yaml", 1)
-		o.mockData.alertsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-alerts.json", 1)
-
 		if o.statusApi {
-			o.mockData.updateStatusPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-us.yaml", 1)
+			return fmt.Errorf("--mock-clusterversion cannot be used with --status-api=true")
+		}
+
+		cvSuffix := "-cv.yaml"
+		if o.mockData.cvPath != "" {
+			o.mockData.operatorsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-co.yaml", 1)
+			o.mockData.machineConfigPoolsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-mcp.yaml", 1)
+			o.mockData.machineConfigsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-mc.yaml", 1)
+			o.mockData.nodesPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-node.yaml", 1)
+			o.mockData.alertsPath = strings.Replace(o.mockData.cvPath, cvSuffix, "-alerts.json", 1)
 		}
 	}
 
-	if o.mockData.cvPath == "" {
+	if !o.statusApi && o.mockData.updateStatusPath != "" {
+		return fmt.Errorf("--mock-updatestatus cannot be used with --status-api=false")
+	}
+
+	if o.mockData.cvPath == "" && o.mockData.updateStatusPath == "" {
 		cfg, err := f.ToRESTConfig()
 		if err != nil {
 			return err
 		}
-		configClient, err := configv1client.NewForConfig(cfg)
-		if err != nil {
-			return err
-		}
-		o.ConfigClient = configClient
 
-		configv1Alpha1Client := configv1alpha1client.NewForConfigOrDie(cfg)
-		o.ConfigV1Alpha1Client = configv1Alpha1Client
+		if o.statusApi {
+			configv1Alpha1Client := configv1alpha1client.NewForConfigOrDie(cfg)
+			o.ConfigV1Alpha1Client = configv1Alpha1Client
+		} else {
 
-		machineConfigClient, err := machineconfigv1client.NewForConfig(cfg)
-		if err != nil {
-			return err
-		}
-		o.MachineConfigClient = machineConfigClient
-		coreClient, err := corev1client.NewForConfig(cfg)
-		if err != nil {
-			return err
-		}
-		o.CoreClient = coreClient
+			configClient, err := configv1client.NewForConfig(cfg)
+			if err != nil {
+				return err
+			}
+			o.ConfigClient = configClient
 
-		routeClient, err := routev1client.NewForConfig(cfg)
-		if err != nil {
-			return err
-		}
-		o.RouteClient = routeClient
+			machineConfigClient, err := machineconfigv1client.NewForConfig(cfg)
+			if err != nil {
+				return err
+			}
+			o.MachineConfigClient = machineConfigClient
+			coreClient, err := corev1client.NewForConfig(cfg)
+			if err != nil {
+				return err
+			}
+			o.CoreClient = coreClient
 
-		routeGetter := func(ctx context.Context, namespace string, name string, opts metav1.GetOptions) (*routev1.Route, error) {
-			return routeClient.Routes(namespace).Get(ctx, name, opts)
-		}
-		o.getAlerts = func(ctx context.Context) ([]byte, error) {
-			return inspectalerts.GetAlerts(ctx, routeGetter, cfg.BearerToken)
+			routeClient, err := routev1client.NewForConfig(cfg)
+			if err != nil {
+				return err
+			}
+			o.RouteClient = routeClient
+
+			routeGetter := func(ctx context.Context, namespace string, name string, opts metav1.GetOptions) (*routev1.Route, error) {
+				return routeClient.Routes(namespace).Get(ctx, name, opts)
+			}
+			o.getAlerts = func(ctx context.Context) ([]byte, error) {
+				return inspectalerts.GetAlerts(ctx, routeGetter, cfg.BearerToken)
+			}
 		}
 	} else {
-		err := o.mockData.load()
+		err := o.mockData.load(o.statusApi)
 		if err != nil {
 			return err
 		}
@@ -159,155 +171,138 @@ func (o *options) Complete(f kcmdutil.Factory, cmd *cobra.Command, args []string
 }
 
 func (o *options) Run(ctx context.Context) error {
-	var cv *configv1.ClusterVersion
-	now := time.Now()
-	if cv = o.mockData.clusterVersion; cv == nil {
-		var err error
-		cv, err = o.ConfigClient.ConfigV1().ClusterVersions().Get(ctx, "version", metav1.GetOptions{})
-		if err != nil {
-			if apierrors.IsNotFound(err) {
-				return fmt.Errorf("no cluster version information available - you must be connected to an OpenShift version 4 server to fetch the current version")
-			}
-			return err
-		}
-	} else {
-		// mock "now" to be the latest time when something happened in the mocked data
-		// add some nanoseconds to exercise rounding
-		now = time.Time{}
-		for _, condition := range cv.Status.Conditions {
-			if condition.LastTransitionTime.After(now) {
-				now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
-			}
-		}
-	}
+	var updateInsights []updateInsight
 
-	var us *configv1alpha1.UpdateStatus
-	if us = o.mockData.updateStatus; o.statusApi && us == nil {
-		var err error
-		us, err = o.ConfigV1Alpha1Client.UpdateStatuses().Get(ctx, "cluster", metav1.GetOptions{})
-		if err != nil {
-			if apierrors.IsNotFound(err) {
-				return fmt.Errorf("no update status information available - you must be connected to an OpenShift version 4 server to fetch the current version")
-			}
-			return err
-		}
-	}
-	if o.statusApi && us == nil {
-		return fmt.Errorf("status API usage enabled but UpdateStatus resource is missing")
-	}
+	var cpStatusDisplayData controlPlaneStatusDisplayData
+	var cpInsights []updateInsight
 
-	var operators *configv1.ClusterOperatorList
-	if operators = o.mockData.clusterOperators; operators == nil {
-		var err error
-		operators, err = o.ConfigClient.ConfigV1().ClusterOperators().List(ctx, metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-	} else {
-		// mock "now" to be the latest time when something happened in the mocked data
-		for _, co := range operators.Items {
-			for _, condition := range co.Status.Conditions {
+	var workerPoolsStatusData []poolDisplayData
+	var controlPlanePoolStatusData poolDisplayData
+	var isWorkerPoolOutdated bool
+
+	var controlPlaneUpdating bool
+	var startedAt time.Time
+	var now time.Time
+
+	if !o.statusApi {
+		var cv *configv1.ClusterVersion
+		now = time.Now()
+		if cv = o.mockData.clusterVersion; cv == nil {
+			var err error
+			cv, err = o.ConfigClient.ConfigV1().ClusterVersions().Get(ctx, "version", metav1.GetOptions{})
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					return fmt.Errorf("no cluster version information available - you must be connected to an OpenShift version 4 server to fetch the current version")
+				}
+				return err
+			}
+		} else {
+			// mock "now" to be the latest time when something happened in the mocked data
+			// add some nanoseconds to exercise rounding
+			now = time.Time{}
+			for _, condition := range cv.Status.Conditions {
 				if condition.LastTransitionTime.After(now) {
 					now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
 				}
 			}
 		}
-	}
-	if len(operators.Items) == 0 {
-		return fmt.Errorf("no cluster operator information available - you must be connected to an OpenShift version 4 server")
-	}
-
-	var pools *machineconfigv1.MachineConfigPoolList
-	if pools = o.mockData.machineConfigPools; pools == nil {
-		var err error
-		pools, err = o.MachineConfigClient.MachineconfigurationV1().MachineConfigPools().List(ctx, metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-	}
-	var allNodes *corev1.NodeList
-	if allNodes = o.mockData.nodes; allNodes == nil {
-		var err error
-		allNodes, err = o.CoreClient.Nodes().List(ctx, metav1.ListOptions{})
-		if err != nil {
-			return err
-		}
-	}
-	var machineConfigs *machineconfigv1.MachineConfigList
-	if machineConfigs = o.mockData.machineConfigs; machineConfigs == nil {
-		machineConfigs = &machineconfigv1.MachineConfigList{}
-		for _, node := range allNodes.Items {
-			for _, key := range []string{mco.CurrentMachineConfigAnnotationKey, mco.DesiredMachineConfigAnnotationKey} {
-				machineConfigName, ok := node.Annotations[key]
-				if !ok || machineConfigName == "" {
-					continue
-				}
-				mc, err := getMachineConfig(ctx, o.MachineConfigClient, machineConfigs.Items, machineConfigName)
-				if err != nil {
-					return err
-				}
-				if mc != nil {
-					machineConfigs.Items = append(machineConfigs.Items, *mc)
+		var operators *configv1.ClusterOperatorList
+		if operators = o.mockData.clusterOperators; operators == nil {
+			var err error
+			operators, err = o.ConfigClient.ConfigV1().ClusterOperators().List(ctx, metav1.ListOptions{})
+			if err != nil {
+				return err
+			}
+		} else {
+			// mock "now" to be the latest time when something happened in the mocked data
+			for _, co := range operators.Items {
+				for _, condition := range co.Status.Conditions {
+					if condition.LastTransitionTime.After(now) {
+						now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+					}
 				}
 			}
 		}
-	}
-
-	var masterSelector labels.Selector
-	var workerSelector labels.Selector
-	customSelectors := map[string]labels.Selector{}
-	for _, pool := range pools.Items {
-		s, err := metav1.LabelSelectorAsSelector(pool.Spec.NodeSelector)
-		if err != nil {
-			return fmt.Errorf("failed to get label selector from the pool: %s", pool.Name)
+		if len(operators.Items) == 0 {
+			return fmt.Errorf("no cluster operator information available - you must be connected to an OpenShift version 4 server")
 		}
-		switch pool.Name {
-		case mco.MachineConfigPoolMaster:
-			masterSelector = s
-		case mco.MachineConfigPoolWorker:
-			workerSelector = s
-		default:
-			customSelectors[pool.Name] = s
+
+		var pools *machineconfigv1.MachineConfigPoolList
+		if pools = o.mockData.machineConfigPools; pools == nil {
+			var err error
+			pools, err = o.MachineConfigClient.MachineconfigurationV1().MachineConfigPools().List(ctx, metav1.ListOptions{})
+			if err != nil {
+				return err
+			}
 		}
-	}
-
-	nodesPerPool := map[string][]corev1.Node{}
-	for _, node := range allNodes.Items {
-		name := whichPool(masterSelector, workerSelector, customSelectors, node)
-		nodesPerPool[name] = append(nodesPerPool[name], node)
-	}
-
-	var updateInsights []updateInsight
-	var workerPoolsStatusData []poolDisplayData
-	var controlPlanePoolStatusData poolDisplayData
-	for _, pool := range pools.Items {
-		nodesStatusData, insights := assessNodesStatus(cv, pool, nodesPerPool[pool.Name], machineConfigs.Items)
-		updateInsights = append(updateInsights, insights...)
-		poolStatus, insights := assessMachineConfigPool(pool, nodesStatusData)
-		updateInsights = append(updateInsights, insights...)
-		if poolStatus.Name == mco.MachineConfigPoolMaster {
-			controlPlanePoolStatusData = poolStatus
-		} else {
-			workerPoolsStatusData = append(workerPoolsStatusData, poolStatus)
+		var allNodes *corev1.NodeList
+		if allNodes = o.mockData.nodes; allNodes == nil {
+			var err error
+			allNodes, err = o.CoreClient.Nodes().List(ctx, metav1.ListOptions{})
+			if err != nil {
+				return err
+			}
 		}
-	}
-
-	var isWorkerPoolOutdated bool
-	for _, pool := range workerPoolsStatusData {
-		if pool.NodesOverview.Total > 0 && pool.Completion != 100 {
-			isWorkerPoolOutdated = true
-			break
+		var machineConfigs *machineconfigv1.MachineConfigList
+		if machineConfigs = o.mockData.machineConfigs; machineConfigs == nil {
+			machineConfigs = &machineconfigv1.MachineConfigList{}
+			for _, node := range allNodes.Items {
+				for _, key := range []string{mco.CurrentMachineConfigAnnotationKey, mco.DesiredMachineConfigAnnotationKey} {
+					machineConfigName, ok := node.Annotations[key]
+					if !ok || machineConfigName == "" {
+						continue
+					}
+					mc, err := getMachineConfig(ctx, o.MachineConfigClient, machineConfigs.Items, machineConfigName)
+					if err != nil {
+						return err
+					}
+					if mc != nil {
+						machineConfigs.Items = append(machineConfigs.Items, *mc)
+					}
+				}
+			}
 		}
-	}
+		var masterSelector labels.Selector
+		var workerSelector labels.Selector
+		customSelectors := map[string]labels.Selector{}
+		for _, pool := range pools.Items {
+			s, err := metav1.LabelSelectorAsSelector(pool.Spec.NodeSelector)
+			if err != nil {
+				return fmt.Errorf("failed to get label selector from the pool: %s", pool.Name)
+			}
+			switch pool.Name {
+			case mco.MachineConfigPoolMaster:
+				masterSelector = s
+			case mco.MachineConfigPoolWorker:
+				workerSelector = s
+			default:
+				customSelectors[pool.Name] = s
+			}
+		}
 
-	var controlPlaneUpdating bool
-	var startedAt time.Time
+		nodesPerPool := map[string][]corev1.Node{}
+		for _, node := range allNodes.Items {
+			name := whichPool(masterSelector, workerSelector, customSelectors, node)
+			nodesPerPool[name] = append(nodesPerPool[name], node)
+		}
+		for _, pool := range pools.Items {
+			nodesStatusData, insights := assessNodesStatus(cv, pool, nodesPerPool[pool.Name], machineConfigs.Items)
+			updateInsights = append(updateInsights, insights...)
+			poolStatus, insights := assessMachineConfigPool(pool, nodesStatusData)
+			updateInsights = append(updateInsights, insights...)
+			if poolStatus.Name == mco.MachineConfigPoolMaster {
+				controlPlanePoolStatusData = poolStatus
+			} else {
+				workerPoolsStatusData = append(workerPoolsStatusData, poolStatus)
+			}
+		}
 
-	if o.statusApi {
-		controlPlaneUpdateProgressing := findCondition(us.Status.ControlPlane.Conditions, "UpdateProgressing")
-		controlPlaneUpdating = controlPlaneUpdateProgressing != nil && controlPlaneUpdateProgressing.Status == metav1.ConditionTrue
-		startedAt = us.Status.ControlPlane.StartedAt.Time
-	} else {
+		for _, pool := range workerPoolsStatusData {
+			if pool.NodesOverview.Total > 0 && pool.Completion != 100 {
+				isWorkerPoolOutdated = true
+				break
+			}
+		}
 		progressing := findClusterOperatorStatusCondition(cv.Status.Conditions, configv1.OperatorProgressing)
 		if progressing == nil {
 			return fmt.Errorf("no current %s info, see `oc describe clusterversion` for more details.\n", configv1.OperatorProgressing)
@@ -317,46 +312,86 @@ func (o *options) Run(ctx context.Context) error {
 		if len(cv.Status.History) > 0 {
 			startedAt = cv.Status.History[0].StartedTime.Time
 		}
+		// get the alerts for the cluster. if we're unable to fetch the alerts, we'll let the user know that alerts
+		// are not being fetched, but rest of the command should work.
+		var alertData AlertData
+		var alertBytes []byte
+		var err error
+		if ap := o.mockData.alertsPath; ap != "" {
+			alertBytes, err = os.ReadFile(o.mockData.alertsPath)
+		} else {
+			alertBytes, err = o.getAlerts(ctx)
+		}
+		if err != nil {
+			fmt.Println("Unable to fetch alerts, ignoring alerts in 'Update Health': ", err)
+		} else {
+			// Unmarshal the JSON data into the struct
+			if err := json.Unmarshal(alertBytes, &alertData); err != nil {
+				fmt.Println("Ignoring alerts in 'Update Health'. Error unmarshalling alerts: %w", err)
+			}
+			updateInsights = append(updateInsights, parseAlertDataToInsights(alertData, startedAt)...)
+		}
+		cpStatusDisplayData, cpInsights = assessControlPlaneStatus(cv, operators.Items, now)
+	} else {
+		var us *configv1alpha1.UpdateStatus
+		if us = o.mockData.updateStatus; o.statusApi && us == nil {
+			var err error
+			us, err = o.ConfigV1Alpha1Client.UpdateStatuses().Get(ctx, "cluster", metav1.GetOptions{})
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					return fmt.Errorf("no update status information available - you must be connected to an OpenShift version 4 server to fetch the current version")
+				}
+				return err
+			}
+		}
+		if o.statusApi && us == nil {
+			return fmt.Errorf("status API usage enabled but UpdateStatus resource is missing")
+		}
+		controlPlaneUpdateProgressing := findCondition(us.Status.ControlPlane.Conditions, "UpdateProgressing")
+		controlPlaneUpdating = controlPlaneUpdateProgressing != nil && controlPlaneUpdateProgressing.Status == metav1.ConditionTrue
+		startedAt = us.Status.ControlPlane.StartedAt.Time
+
+		// mock "now" to be the latest time when something happened in the mocked data
+		// add some nanoseconds to exercise rounding
+		now = startedAt
+		for _, condition := range us.Status.Conditions {
+			if condition.LastTransitionTime.After(now) {
+				now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+			}
+		}
+		for _, condition := range us.Status.ControlPlane.Conditions {
+			if condition.LastTransitionTime.After(now) {
+				now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+			}
+		}
+
+		cpStatusDisplayData.Assessment = assessmentState(us.Status.ControlPlane.Assessment)
+		cpStatusDisplayData.Completion = float64(us.Status.ControlPlane.Completion) / 100.0
+		cpStatusDisplayData.Duration = now.Sub(startedAt).Round(time.Second)
+		cpStatusDisplayData.TargetVersion.target = us.Status.ControlPlane.Versions.Target
+		cpStatusDisplayData.TargetVersion.previous = us.Status.ControlPlane.Versions.Previous
+		cpStatusDisplayData.TargetVersion.isTargetInstall = us.Status.ControlPlane.Versions.IsTargetInstall
+		cpStatusDisplayData.TargetVersion.isPreviousPartial = us.Status.ControlPlane.Versions.IsPreviousPartial
+
 	}
+
 	if !controlPlaneUpdating && !isWorkerPoolOutdated {
-		fmt.Fprintf(o.Out, "The cluster is not updating.\n")
+		_, _ = fmt.Fprintf(o.Out, "The cluster is not updating.\n")
 		return nil
 	}
 
-	updatingFor := now.Sub(startedAt).Round(time.Second)
-
-	// get the alerts for the cluster. if we're unable to fetch the alerts, we'll let the user know that alerts
-	// are not being fetched, but rest of the command should work.
-	var alertData AlertData
-	var alertBytes []byte
-	var err error
-	if ap := o.mockData.alertsPath; ap != "" {
-		alertBytes, err = os.ReadFile(o.mockData.alertsPath)
-	} else {
-		alertBytes, err = o.getAlerts(ctx)
-	}
-	if err != nil {
-		fmt.Println("Unable to fetch alerts, ignoring alerts in 'Update Health': ", err)
-	} else {
-		// Unmarshal the JSON data into the struct
-		if err := json.Unmarshal(alertBytes, &alertData); err != nil {
-			fmt.Println("Ignoring alerts in 'Update Health'. Error unmarshaling alerts: %w", err)
-		}
-		updateInsights = append(updateInsights, parseAlertDataToInsights(alertData, startedAt)...)
-	}
-
-	controlPlaneStatusData, insights := assessControlPlaneStatus(cv, operators.Items, now)
-	updateInsights = append(updateInsights, insights...)
-	_ = controlPlaneStatusData.Write(o.Out)
+	updateInsights = append(updateInsights, cpInsights...)
+	_ = cpStatusDisplayData.Write(o.Out)
 	controlPlanePoolStatusData.WriteNodes(o.Out, o.enabledDetailed(detailedOutputNodes))
 
-	fmt.Fprintf(o.Out, "\n= Worker Upgrade =\n")
+	_, _ = fmt.Fprintf(o.Out, "\n= Worker Upgrade =\n")
 	writePools(o.Out, workerPoolsStatusData)
 	for _, pool := range workerPoolsStatusData {
 		pool.WriteNodes(o.Out, o.enabledDetailed(detailedOutputNodes))
 	}
 
-	fmt.Fprintf(o.Out, "\n")
+	updatingFor := now.Sub(startedAt).Round(time.Second)
+	_, _ = fmt.Fprintf(o.Out, "\n")
 	upgradeHealth, allowDetailed := assessUpdateInsights(updateInsights, updatingFor, now)
 	_ = upgradeHealth.Write(o.Out, allowDetailed && o.enabledDetailed(detailedOutputHealth))
 	return nil

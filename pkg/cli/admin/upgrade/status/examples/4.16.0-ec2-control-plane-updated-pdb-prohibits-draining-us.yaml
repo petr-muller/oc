@@ -16,5 +16,5 @@ status:
       type: UpdateProgressing
     startedAt: "2024-02-27T12:12:27Z"
     versions:
-      original: 4.16.0-ec.2
+      previous: 4.16.0-ec.2
       target: 4.16.0-ec.3
