@@ -8,7 +8,7 @@ status:
     assessment: Progressing
     completion: 0
     conditions:
-    - lastTransitionTime: "2023-11-21T15:02:46Z"
+    - lastTransitionTime: "2023-11-21T15:04:15Z"
       message: 'Working towards 4.15.0-ec.2: 106 of 863 done (12% complete), waiting
       on etcd, kube-apiserver'
       reason: ClusterVersionProgressing

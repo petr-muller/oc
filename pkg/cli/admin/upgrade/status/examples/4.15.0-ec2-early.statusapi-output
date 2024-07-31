@@ -2,7 +2,7 @@
 Assessment:      Progressing
 Target Version:  4.15.0-ec.2 (from incomplete 4.14.1)
 Completion:      0%
-Duration:        now
+Duration:        1m29s
 Operator Status: 0 Healthy
 
 = Worker Upgrade =
@@ -11,4 +11,4 @@ WORKER POOL   ASSESSMENT   COMPLETION   STATUS
 
 = Update Health =
 SINCE   LEVEL   IMPACT   MESSAGE
-now     Info    None     Update is proceeding well
+1m29s   Info    None     Update is proceeding well
