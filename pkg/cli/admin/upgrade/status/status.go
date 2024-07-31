@@ -366,7 +366,7 @@ func (o *options) Run(ctx context.Context) error {
 		}
 
 		cpStatusDisplayData.Assessment = assessmentState(us.Status.ControlPlane.Assessment)
-		cpStatusDisplayData.Completion = float64(us.Status.ControlPlane.Completion) / 100.0
+		cpStatusDisplayData.Completion = float64(us.Status.ControlPlane.Completion)
 		cpStatusDisplayData.Duration = now.Sub(startedAt).Round(time.Second)
 		cpStatusDisplayData.TargetVersion.target = us.Status.ControlPlane.Versions.Target
 		cpStatusDisplayData.TargetVersion.previous = us.Status.ControlPlane.Versions.Previous
