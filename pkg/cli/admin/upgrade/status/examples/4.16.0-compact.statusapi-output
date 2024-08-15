@@ -1,0 +1,14 @@
+= Control Plane =
+Assessment:      Progressing
+Target Version:  4.17.0-ec.0 (from 4.16.0-0.nightly-2024-08-01-082745)
+Completion:      91% (0 operators updated, 0 updating, 0 waiting)
+Duration:        27m58s
+Operator Status: 0 Healthy
+
+= Worker Upgrade =
+
+WORKER POOL   ASSESSMENT   COMPLETION   STATUS
+
+= Update Health =
+SINCE    LEVEL   IMPACT   MESSAGE
+27m58s   Info    None     Update is proceeding well

@@ -1,0 +1,19 @@
+apiVersion: config.openshift.io/v1alpha1
+kind: UpdateStatus
+metadata:
+  name: cluster
+spec: {}
+status:
+  controlPlane:
+    assessment: Progressing
+    completion: 6
+    conditions:
+    - lastTransitionTime: "2024-02-27T12:15:21Z"
+      message: 'Update is proceeding well'
+      reason: ClusterVersionProgressing
+      status: "True"
+      type: UpdateProgressing
+    startedAt: "2024-02-27T12:12:27Z"
+    versions:
+      previous: 4.16.0-0.nightly-2024-08-01-082745
+      target: 4.17.0-ec.0
