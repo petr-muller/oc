@@ -373,6 +373,40 @@ func (o *options) Run(ctx context.Context) error {
 		cpStatusDisplayData.TargetVersion.isTargetInstall = us.Status.ControlPlane.Versions.IsTargetInstall
 		cpStatusDisplayData.TargetVersion.isPreviousPartial = us.Status.ControlPlane.Versions.IsPreviousPartial
 
+		for _, co := range us.Status.ControlPlane.Operators {
+			if updating := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeUpdating); updating != nil {
+				switch updating.Status {
+				case metav1.ConditionTrue:
+					cpStatusDisplayData.Operators.Updating++
+				case metav1.ConditionFalse:
+					switch updating.Reason {
+					case configv1alpha1.OperatorUpdateStatusUpdatingReasonUpdated:
+						cpStatusDisplayData.Operators.Updated++
+					case configv1alpha1.OperatorUpdateStatusUpdatingReasonPending:
+						cpStatusDisplayData.Operators.Waiting++
+					default:
+					}
+				case metav1.ConditionUnknown:
+				default:
+				}
+			}
+			cpStatusDisplayData.Operators.Total++
+			if healthy := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeHealthy); healthy != nil {
+				switch healthy.Status {
+				case metav1.ConditionFalse:
+					switch healthy.Reason {
+					case configv1alpha1.OperatorUpdateStatusHealthyReasonDegraded:
+						cpStatusDisplayData.Operators.Degraded++
+					case configv1alpha1.OperatorUpdateStatusHealthyReasonUnavailable:
+						cpStatusDisplayData.Operators.Unavailable++
+					default:
+					}
+				case metav1.ConditionTrue:
+				case metav1.ConditionUnknown:
+				default:
+				}
+			}
+		}
 	}
 
 	if !controlPlaneUpdating && !isWorkerPoolOutdated {

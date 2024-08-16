@@ -1,9 +1,9 @@
 = Control Plane =
 Assessment:      Progressing
 Target Version:  4.15.0-ec.2 (from 4.15.0-ec.1)
-Completion:      0% (0 operators updated, 0 updating, 0 waiting)
-Duration:        now
-Operator Status: 0 Healthy
+Completion:      43% (3 operators updated, 0 updating, 4 waiting)
+Duration:        53m
+Operator Status: 7 Healthy
 
 = Worker Upgrade =
 
@@ -11,4 +11,4 @@ WORKER POOL   ASSESSMENT   COMPLETION   STATUS
 
 = Update Health =
 SINCE   LEVEL   IMPACT   MESSAGE
-now     Info    None     Update is proceeding well
+53m     Info    None     Update is proceeding well

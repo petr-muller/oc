@@ -5,15 +5,315 @@ metadata:
 spec: {}
 status:
   controlPlane:
-    assessment: Progressing
-    completion: 0
+    assessment: Progressing - Slow
+    completion: 97
     conditions:
-    - lastTransitionTime: "2023-11-24T14:49:35Z"
+    - lastTransitionTime: "2023-11-24T15:48:35Z"
       message: 'Working towards 4.15.0-ec.2: 110 of 863 done (12% complete), waiting
       up to 40 minutes on etcd'
       reason: ClusterVersionProgressing
       status: "True"
       type: UpdateProgressing
+    operators:
+    - name: authentication
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:24:15Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:23:44Z"
+        reason: Updated
+    - name: baremetal
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:45:14Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T13:45:14Z"
+        reason: Updated
+    - name: cloud-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:42:29Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T13:42:29Z"
+        reason: Updated
+    - name: cloud-credential
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:42:12Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:15:28Z"
+        reason: Updated
+    - name: cluster-autoscaler
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:50:39Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:16:07Z"
+        reason: Updated
+    - name: config-operator
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:15Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T13:44:15Z"
+        reason: Updated
+    - name: console
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:24:15Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:22:34Z"
+        reason: Updated
+    - name: control-plane-machine-set
+      conditions:
+      - type: Healthy
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:48Z"
+        reason: Unavailable
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:48Z"
+        reason: Updated
+    - name: csi-snapshot-controller
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:27Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:43:42Z"
+        reason: Updated
+    - name: dns
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:51:47Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:49Z"
+        reason: Updated
+    - name: etcd
+      conditions:
+      - type: Healthy
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:48:23Z"
+        reason: Degraded
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T14:55:49Z"
+        reason: Updated
+    - name: image-registry
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:51:42Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:49Z"
+        reason: Updated
+    - name: ingress
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:52:25Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:38:32Z"
+        reason: Updated
+    - name: insights
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:50:39Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T13:50:39Z"
+        reason: Updated
+    - name: kube-apiserver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:43:02Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:03:38Z"
+        reason: Updated
+    - name: kube-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:43:02Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:07:47Z"
+        reason: Updated
+    - name: kube-scheduler
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:43:02Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:09:00Z"
+        reason: Updated
+    - name: kube-storage-version-migrator
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:33:39Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:33:39Z"
+        reason: Updated
+    - name: machine-api
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:50:36Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:14:27Z"
+        reason: Updated
+    - name: machine-approver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:30Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T13:44:30Z"
+        reason: Updated
+    - name: machine-config
+      conditions:
+      - type: Healthy
+        status: "False"
+        reason: Unavailable
+        lastTransitionTime: "2023-11-24T15:28:41Z"
+      - type: Updating
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:27:08Z"
+    - name: marketplace
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:45:10Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T13:45:10Z"
+        reason: Updated
+    - name: monitoring
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:58:08Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:17:11Z"
+        reason: Updated
+    - name: network
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:32:51Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:48Z"
+        reason: Updated
+    - name: node-tuning
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:16:54Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:48Z"
+        reason: Updated
+    - name: openshift-apiserver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:52:20Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:43:34Z"
+        reason: Updated
+    - name: openshift-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:50:55Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:23:07Z"
+        reason: Updated
+    - name: openshift-samples
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T15:15:33Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:15:33Z"
+        reason: Updated
+    - name: operator-lifecycle-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:58Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:15:34Z"
+        reason: Updated
+    - name: operator-lifecycle-manager-catalog
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:57Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:15:43Z"
+        reason: Updated
+    - name: operator-lifecycle-manager-packageserver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:50:30Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:18:36Z"
+        reason: Updated
+    - name: service-ca
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:18Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:43:29Z"
+        reason: Updated
+    - name: storage
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-24T13:44:57Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-24T15:46:48Z"
+        reason: Updated
     startedAt: "2023-11-24T14:49:35Z"
     versions:
       previous: 4.14.0-rc.3

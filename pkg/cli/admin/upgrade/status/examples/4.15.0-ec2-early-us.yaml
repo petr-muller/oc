@@ -14,6 +14,335 @@ status:
       reason: ClusterVersionProgressing
       status: "True"
       type: UpdateProgressing
+    operators:
+    - name: authentication
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-10-26T13:46:13Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-16T10:06:40Z"
+        version: 4.14.1
+    - name: baremetal
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:39:18Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2021-09-13T16:39:18Z"
+        version: 4.14.1
+    - name: cloud-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-09-05T23:59:11Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-06-07T09:50:23Z"
+        version: 4.14.1
+    - name: cloud-credential
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:34:31Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:03:20Z"
+        version: 4.14.1
+    - name: cluster-autoscaler
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:42:27Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:04:09Z"
+        version: 4.14.1
+    - name: config-operator
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:38:20Z"
+      - type: Updating
+        status: "False"
+        reason: "Updated"
+        lastTransitionTime: "2021-09-13T16:38:20Z"
+        version: 4.15.0-ec.2
+    - name: console
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-19T12:31:47Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-16T10:05:26Z"
+        version: 4.14.1
+    - name: control-plane-machine-set
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-03-20T16:30:00Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-03-20T16:30:00Z"
+        version: 4.14.1
+    - name: csi-snapshot-controller
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-03-08T19:58:44Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:23:16Z"
+        version: 4.14.1
+    - name: dns
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-10-25T13:19:25Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-21T15:00:36Z"
+        version: 4.14.1
+    - name: etcd
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:28:37Z"
+      - type: Updating
+        status: "True"
+        lastTransitionTime: "2023-11-21T15:03:30Z"
+        version: 4.14.1
+    - name: image-registry
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-10-23T13:30:29Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-21T15:00:36Z"
+        version: 4.14.1
+    - name: ingress
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-08-02T13:39:57Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:18:04Z"
+        version: 4.14.1
+    - name: insights
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2022-05-04T03:37:04Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2022-05-04T03:37:04Z"
+        version: 4.14.1
+    - name: kube-apiserver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:28:19Z"
+      - type: Updating
+        status: "True"
+        lastTransitionTime: "2023-11-21T15:04:15Z"
+        version: 4.14.1
+    - name: kube-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:28:19Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-16T10:12:48Z"
+        version: 4.14.1
+    - name: kube-scheduler
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:28:19Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-16T10:14:54Z"
+        version: 4.14.1
+    - name: kube-storage-version-migrator
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:23:07Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:23:07Z"
+        version: 4.14.1
+    - name: machine-api
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:42:25Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:02:24Z"
+        version: 4.14.1
+    - name: machine-approver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:39:16Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2021-09-13T16:39:16Z"
+        version: 4.14.1
+    - name: machine-config
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-10-25T13:43:22Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:29:07Z"
+        version: 4.14.1
+    - name: marketplace
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:39:07Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2021-09-13T16:39:07Z"
+        version: 4.14.1
+    - name: monitoring
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-10-25T13:00:22Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:03:37Z"
+        version: 4.14.1
+    - name: network
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-19T23:54:54Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-21T15:01:18Z"
+        version: 4.14.1
+    - name: node-tuning
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:03:21Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-21T15:00:41Z"
+        version: 4.14.1
+    - name: openshift-apiserver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-09-11T17:41:26Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-12T16:50:01Z"
+        version: 4.14.1
+    - name: openshift-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-03-20T16:33:15Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-19T23:48:48Z"
+        version: 4.14.1
+    - name: openshift-samples
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-01T12:03:32Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-14T23:18:05Z"
+        version: 4.14.1
+    - name: operator-lifecycle-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:39:21Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-10-25T12:47:17Z"
+        version: 4.14.1
+    - name: operator-lifecycle-manager-catalog
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:38:49Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-01T12:08:24Z"
+        version: 4.14.1
+    - name: operator-lifecycle-manager-packageserver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-15T22:24:42Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-15T22:24:42Z"
+        version: 4.14.1
+    - name: service-ca
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-09-13T16:38:23Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-12T16:46:37Z"
+        version: 4.14.1
+    - name: storage
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-03-08T19:35:51Z"
+      - type: Updating
+        status: "False"
+        reason: "Pending"
+        lastTransitionTime: "2023-11-21T15:00:39Z"
+        version: 4.14.1
     startedAt: "2023-11-21T15:02:46Z"
     versions:
       previous: 4.14.1

@@ -6,14 +6,85 @@ spec: {}
 status:
   controlPlane:
     assessment: Progressing
-    completion: 0
+    completion: 43
     conditions:
-    - lastTransitionTime: "2023-11-20T14:06:46Z"
+    - lastTransitionTime: "2023-11-20T14:59:46Z"
       message: 'Working towards 4.15.0-ec.2: 357 of 1021 done (34% complete), waiting
       up to 40 minutes on cluster-api'
       reason: ClusterVersionProgressing
       status: "True"
       type: UpdateProgressing
+    operators:
+    - name: baremetal
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2021-03-05T13:32:45Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2021-03-05T13:32:45Z"
+        reason: Pending
+        version: 4.15.0-ec.1
+    - name: cloud-controller-manager
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2022-08-03T15:08:54Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2022-08-16T17:07:26Z"
+        reason: Updated
+        version: 4.15.0-ec.2
+    - name: config-operator
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2020-07-03T17:40:19Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2020-07-03T17:40:19Z"
+        reason: Updated
+        version: 4.15.0-ec.2
+    - name: control-plane-machine-set
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2022-09-20T12:51:24Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2022-09-20T12:51:24Z"
+        reason: Updated
+        version: 4.15.0-ec.2
+    - name: machine-approver
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2020-07-03T17:45:36Z"
+      - type: Updating
+        status: "False"
+        reason: Pending
+        lastTransitionTime: "2020-07-03T17:45:36Z"
+        version: 4.15.0-ec.1
+    - name: olm
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-15T20:58:25Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-15T20:58:25Z"
+        reason: Pending
+        version: 4.15.0-ec.1
+    - name: platform-operators-aggregated
+      conditions:
+      - type: Healthy
+        status: "True"
+        lastTransitionTime: "2023-11-20T13:25:24Z"
+      - type: Updating
+        status: "False"
+        lastTransitionTime: "2023-11-20T13:25:24Z"
+        reason: Pending
+        version: 4.15.0-ec.1
     startedAt: "2023-11-20T14:06:46Z"
     versions:
       previous: 4.15.0-ec.1

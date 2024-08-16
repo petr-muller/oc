@@ -1,9 +1,9 @@
 = Control Plane =
-Assessment:      Progressing
+Assessment:      Completed
 Target Version:  4.16.0-ec.3 (from 4.16.0-ec.2)
-Completion:      0% (0 operators updated, 0 updating, 0 waiting)
+Completion:      100% (36 operators updated, 0 updating, 0 waiting)
 Duration:        3h30m31s
-Operator Status: 0 Healthy
+Operator Status: 35 Healthy, 1 Available but degraded
 
 = Worker Upgrade =
 
