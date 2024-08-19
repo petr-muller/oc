@@ -317,6 +317,7 @@ status:
         reason: "Updated"
         lastTransitionTime: "2023-11-03T16:28:49Z"
     startedAt: "2023-11-03T15:28:04Z"
+    estimatedCompletedAt: "2023-11-03T16:52:04Z"
     versions:
       previous: 4.14.0-rc.3
       target: 4.14.1

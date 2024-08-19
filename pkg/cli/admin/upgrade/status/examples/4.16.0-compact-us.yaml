@@ -345,6 +345,7 @@ status:
         reason: Updated
         version: 4.17.0-ec.0
     startedAt: "2024-02-27T12:12:27Z"
+    estimatedCompletedAt: "2024-02-27T13:10:25Z"
     versions:
       previous: 4.16.0-0.nightly-2024-08-01-082745
       target: 4.17.0-ec.0

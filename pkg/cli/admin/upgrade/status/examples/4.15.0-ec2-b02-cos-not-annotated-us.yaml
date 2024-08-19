@@ -86,6 +86,7 @@ status:
         reason: Pending
         version: 4.15.0-ec.1
     startedAt: "2023-11-20T14:06:46Z"
+    estimatedCompletedAt: "2023-11-20T16:38:46Z"
     versions:
       previous: 4.15.0-ec.1
       target: 4.15.0-ec.2

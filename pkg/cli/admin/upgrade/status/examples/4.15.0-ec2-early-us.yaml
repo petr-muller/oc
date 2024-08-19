@@ -344,6 +344,7 @@ status:
         lastTransitionTime: "2023-11-21T15:00:39Z"
         version: 4.14.1
     startedAt: "2023-11-21T15:02:46Z"
+    estimatedCompletedAt: "2023-11-21T16:29:15Z"
     versions:
       previous: 4.14.1
       target: 4.15.0-ec.2

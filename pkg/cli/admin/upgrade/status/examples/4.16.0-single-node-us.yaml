@@ -313,6 +313,7 @@ status:
         lastTransitionTime: "2024-08-05T15:14:56Z"
         reason: Pending
     startedAt: "2024-02-27T12:12:27Z"
+    estimatedCompletedAt: "2024-02-27T13:24:21Z"
     versions:
       previous: 4.16.0-0.nightly-2024-08-01-082745
       target: 4.17.0-ec.0

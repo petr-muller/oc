@@ -367,11 +367,17 @@ func (o *options) Run(ctx context.Context) error {
 
 		cpStatusDisplayData.Assessment = assessmentState(us.Status.ControlPlane.Assessment)
 		cpStatusDisplayData.Completion = float64(us.Status.ControlPlane.Completion)
-		cpStatusDisplayData.Duration = now.Sub(startedAt).Round(time.Second)
+		if updatingFor := now.Sub(startedAt).Round(time.Second); updatingFor > 10*time.Minute {
+			cpStatusDisplayData.Duration = updatingFor.Round(time.Minute)
+		} else {
+			cpStatusDisplayData.Duration = updatingFor.Round(time.Second)
+		}
 		cpStatusDisplayData.TargetVersion.target = us.Status.ControlPlane.Versions.Target
 		cpStatusDisplayData.TargetVersion.previous = us.Status.ControlPlane.Versions.Previous
 		cpStatusDisplayData.TargetVersion.isTargetInstall = us.Status.ControlPlane.Versions.IsTargetInstall
 		cpStatusDisplayData.TargetVersion.isPreviousPartial = us.Status.ControlPlane.Versions.IsPreviousPartial
+		cpStatusDisplayData.EstTimeToComplete = us.Status.ControlPlane.EstimatedCompletedAt.Time.Sub(now).Round(time.Second)
+		cpStatusDisplayData.EstDuration = us.Status.ControlPlane.EstimatedCompletedAt.Time.Sub(startedAt).Round(time.Second)
 
 		for _, co := range us.Status.ControlPlane.Operators {
 			if updating := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeUpdating); updating != nil {
