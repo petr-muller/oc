@@ -314,6 +314,19 @@ status:
         reason: Pending
     startedAt: "2024-02-27T12:12:27Z"
     estimatedCompletedAt: "2024-02-27T13:24:21Z"
+    nodes:
+      name: master
+      kind: MachineConfigPool
+      apiGroup: machineconfiguration.openshift.io/v1
+      nodes:
+      - name: ip-10-0-8-37.ec2.internal
+        kind: Node
+        version: 4.16.0-0.nightly-2024-08-01-082745
+        conditions:
+        - type: Updating
+          status: "False"
+          lastTransitionTime: "2024-08-05T15:14:45Z"
+          reason: Pending
     versions:
       previous: 4.16.0-0.nightly-2024-08-01-082745
       target: 4.17.0-ec.0
