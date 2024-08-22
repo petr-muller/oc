@@ -364,31 +364,35 @@ func (o *options) Run(ctx context.Context) error {
 
 		startedAt = cvInsight.StartedAt.Time
 
-		// mock "now" to be the latest time when something happened in the mocked data
-		// add some nanoseconds to exercise rounding
-		now = startedAt
-		for _, condition := range us.Status.Conditions {
-			if condition.LastTransitionTime.After(now) {
-				now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+		if o.mockData.updateStatus == nil {
+			now = time.Now()
+		} else {
+			// mock "now" to be the latest time when something happened in the mocked data
+			// add some nanoseconds to exercise rounding
+			now = startedAt
+			for _, condition := range us.Status.Conditions {
+				if condition.LastTransitionTime.After(now) {
+					now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+				}
 			}
-		}
-		for _, condition := range us.Status.ControlPlane.Conditions {
-			if condition.LastTransitionTime.After(now) {
-				now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+			for _, condition := range us.Status.ControlPlane.Conditions {
+				if condition.LastTransitionTime.After(now) {
+					now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+				}
 			}
-		}
-		for _, informer := range us.Status.ControlPlane.Informers {
-			for _, insight := range informer.Insights {
-				if insight.ClusterVersionStatusInsight != nil {
-					if insight.ClusterVersionStatusInsight.StartedAt.After(now) {
-						now = insight.ClusterVersionStatusInsight.StartedAt.Time.Add(368975 * time.Nanosecond)
-					}
-					if insight.ClusterVersionStatusInsight.CompletedAt.After(now) {
-						now = insight.ClusterVersionStatusInsight.CompletedAt.Time.Add(368975 * time.Nanosecond)
-					}
-					for _, condition := range insight.ClusterVersionStatusInsight.Conditions {
-						if condition.LastTransitionTime.After(now) {
-							now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+			for _, informer := range us.Status.ControlPlane.Informers {
+				for _, insight := range informer.Insights {
+					if insight.ClusterVersionStatusInsight != nil {
+						if insight.ClusterVersionStatusInsight.StartedAt.After(now) {
+							now = insight.ClusterVersionStatusInsight.StartedAt.Time.Add(368975 * time.Nanosecond)
+						}
+						if insight.ClusterVersionStatusInsight.CompletedAt.After(now) {
+							now = insight.ClusterVersionStatusInsight.CompletedAt.Time.Add(368975 * time.Nanosecond)
+						}
+						for _, condition := range insight.ClusterVersionStatusInsight.Conditions {
+							if condition.LastTransitionTime.After(now) {
+								now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+							}
 						}
 					}
 				}
