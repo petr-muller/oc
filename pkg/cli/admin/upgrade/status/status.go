@@ -14,6 +14,7 @@ import (
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -347,9 +348,21 @@ func (o *options) Run(ctx context.Context) error {
 		if o.statusApi && us == nil {
 			return fmt.Errorf("status API usage enabled but UpdateStatus resource is missing")
 		}
-		controlPlaneUpdateProgressing := findCondition(us.Status.ControlPlane.Conditions, "UpdateProgressing")
+		controlPlaneUpdateProgressing := meta.FindStatusCondition(us.Status.ControlPlane.Conditions, string(configv1alpha1.ControlPlaneConditionTypeUpdating))
 		controlPlaneUpdating = controlPlaneUpdateProgressing != nil && controlPlaneUpdateProgressing.Status == metav1.ConditionTrue
-		startedAt = us.Status.ControlPlane.StartedAt.Time
+
+		var cvInsight *configv1alpha1.ClusterVersionStatusInsight
+		for _, informer := range us.Status.ControlPlane.Informers {
+			if cvInsight = findClusterVersionInsight(informer.Insights); cvInsight != nil {
+				break
+			}
+		}
+
+		if cvInsight == nil {
+			return fmt.Errorf("no ClusterVersion insight")
+		}
+
+		startedAt = cvInsight.StartedAt.Time
 
 		// mock "now" to be the latest time when something happened in the mocked data
 		// add some nanoseconds to exercise rounding
@@ -364,145 +377,165 @@ func (o *options) Run(ctx context.Context) error {
 				now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
 			}
 		}
+		for _, informer := range us.Status.ControlPlane.Informers {
+			for _, insight := range informer.Insights {
+				if insight.ClusterVersionStatusInsight != nil {
+					if insight.ClusterVersionStatusInsight.StartedAt.After(now) {
+						now = insight.ClusterVersionStatusInsight.StartedAt.Time.Add(368975 * time.Nanosecond)
+					}
+					if insight.ClusterVersionStatusInsight.CompletedAt.After(now) {
+						now = insight.ClusterVersionStatusInsight.CompletedAt.Time.Add(368975 * time.Nanosecond)
+					}
+					for _, condition := range insight.ClusterVersionStatusInsight.Conditions {
+						if condition.LastTransitionTime.After(now) {
+							now = condition.LastTransitionTime.Time.Add(368975 * time.Nanosecond)
+						}
+					}
+				}
+			}
+		}
 
-		cpStatusDisplayData.Assessment = assessmentState(us.Status.ControlPlane.Assessment)
-		cpStatusDisplayData.Completion = float64(us.Status.ControlPlane.Completion)
+		cpStatusDisplayData.Assessment = assessmentState(cvInsight.Assessment)
+		cpStatusDisplayData.Completion = float64(cvInsight.Completion)
 		if updatingFor := now.Sub(startedAt).Round(time.Second); updatingFor > 10*time.Minute {
 			cpStatusDisplayData.Duration = updatingFor.Round(time.Minute)
 		} else {
 			cpStatusDisplayData.Duration = updatingFor.Round(time.Second)
 		}
-		cpStatusDisplayData.TargetVersion.target = us.Status.ControlPlane.Versions.Target
-		cpStatusDisplayData.TargetVersion.previous = us.Status.ControlPlane.Versions.Previous
-		cpStatusDisplayData.TargetVersion.isTargetInstall = us.Status.ControlPlane.Versions.IsTargetInstall
-		cpStatusDisplayData.TargetVersion.isPreviousPartial = us.Status.ControlPlane.Versions.IsPreviousPartial
-		cpStatusDisplayData.EstTimeToComplete = us.Status.ControlPlane.EstimatedCompletedAt.Time.Sub(now).Round(time.Second)
-		cpStatusDisplayData.EstDuration = us.Status.ControlPlane.EstimatedCompletedAt.Time.Sub(startedAt).Round(time.Second)
 
-		for _, co := range us.Status.ControlPlane.Operators {
-			if updating := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeUpdating); updating != nil {
-				switch updating.Status {
-				case metav1.ConditionTrue:
-					cpStatusDisplayData.Operators.Updating++
-				case metav1.ConditionFalse:
-					switch updating.Reason {
-					case configv1alpha1.OperatorUpdateStatusUpdatingReasonUpdated:
-						cpStatusDisplayData.Operators.Updated++
-					case configv1alpha1.OperatorUpdateStatusUpdatingReasonPending:
-						cpStatusDisplayData.Operators.Waiting++
-					default:
-					}
-				case metav1.ConditionUnknown:
-				default:
-				}
-			}
-			cpStatusDisplayData.Operators.Total++
-			if healthy := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeHealthy); healthy != nil {
-				switch healthy.Status {
-				case metav1.ConditionFalse:
-					switch healthy.Reason {
-					case configv1alpha1.OperatorUpdateStatusHealthyReasonDegraded:
-						cpStatusDisplayData.Operators.Degraded++
-					case configv1alpha1.OperatorUpdateStatusHealthyReasonUnavailable:
-						cpStatusDisplayData.Operators.Unavailable++
-					default:
-					}
-				case metav1.ConditionTrue:
-				case metav1.ConditionUnknown:
-				default:
-				}
-			}
-		}
+		cpStatusDisplayData.TargetVersion.target = cvInsight.Versions.Target
+		cpStatusDisplayData.TargetVersion.previous = cvInsight.Versions.Previous
+		cpStatusDisplayData.TargetVersion.isTargetInstall = cvInsight.Versions.IsTargetInstall
+		cpStatusDisplayData.TargetVersion.isPreviousPartial = cvInsight.Versions.IsPreviousPartial
 
-		if cpPool := us.Status.ControlPlane.Nodes; cpPool != nil {
-			controlPlanePoolStatusData = poolDisplayData{
-				Name:       cpPool.Resource.Name,
-				Assessment: "",
-				Completion: 0,
-				Duration:   0,
-				NodesOverview: nodesOverviewDisplayData{
-					Total:       0,
-					Available:   0,
-					Progressing: 0,
-					Outdated:    0,
-					Draining:    0,
-					Excluded:    0,
-					Degraded:    0,
-				},
-				Nodes: nil,
-			}
-			for _, node := range cpPool.Nodes {
-				ndd := nodeDisplayData{
-					Name:     node.Resource.Name,
-					Version:  node.Version,
-					Estimate: shortDuration(node.EstToComplete.Duration),
-					Message:  node.Message,
-				}
+		cpStatusDisplayData.CompletionAt = cvInsight.CompletedAt.Time
+		cpStatusDisplayData.EstTimeToComplete = cvInsight.EstimatedCompletedAt.Time.Sub(now).Round(time.Second)
+		cpStatusDisplayData.EstDuration = cvInsight.EstimatedCompletedAt.Time.Sub(startedAt).Round(time.Second)
 
-				controlPlanePoolStatusData.NodesOverview.Total++
+		// for _, co := range us.Status.ControlPlane.Operators {
+		// 	if updating := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeUpdating); updating != nil {
+		// 		switch updating.Status {
+		// 		case metav1.ConditionTrue:
+		// 			cpStatusDisplayData.Operators.Updating++
+		// 		case metav1.ConditionFalse:
+		// 			switch updating.Reason {
+		// 			case configv1alpha1.OperatorUpdateStatusUpdatingReasonUpdated:
+		// 				cpStatusDisplayData.Operators.Updated++
+		// 			case configv1alpha1.OperatorUpdateStatusUpdatingReasonPending:
+		// 				cpStatusDisplayData.Operators.Waiting++
+		// 			default:
+		// 			}
+		// 		case metav1.ConditionUnknown:
+		// 		default:
+		// 		}
+		// 	}
+		// 	cpStatusDisplayData.Operators.Total++
+		// 	if healthy := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeHealthy); healthy != nil {
+		// 		switch healthy.Status {
+		// 		case metav1.ConditionFalse:
+		// 			switch healthy.Reason {
+		// 			case configv1alpha1.OperatorUpdateStatusHealthyReasonDegraded:
+		// 				cpStatusDisplayData.Operators.Degraded++
+		// 			case configv1alpha1.OperatorUpdateStatusHealthyReasonUnavailable:
+		// 				cpStatusDisplayData.Operators.Unavailable++
+		// 			default:
+		// 			}
+		// 		case metav1.ConditionTrue:
+		// 		case metav1.ConditionUnknown:
+		// 		default:
+		// 		}
+		// 	}
+		// }
 
-				if node.Conditions != nil {
-
-					if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeUpdating); c != nil {
-						if c.Status == metav1.ConditionTrue {
-							ndd.isUpdating = true
-							ndd.Assessment = nodeAssessmentProgressing
-
-							switch c.Reason {
-							case configv1alpha1.NodeUpdateStatusUpdatingReasonDraining:
-								ndd.Phase = phaseStateDraining
-							case configv1alpha1.NodeUpdateStatusUpdatingReasonUpdating:
-								ndd.Phase = phaseStateUpdating
-							case configv1alpha1.NodeUpdateStatusUpdatingReasonRebooting:
-								ndd.Phase = phaseStateRebooting
-							}
-						}
-
-						if c.Status == metav1.ConditionFalse {
-							ndd.isUpdating = false
-							switch c.Reason {
-							case configv1alpha1.NodeUpdateStatusUpdatingReasonPaused:
-								ndd.Assessment = nodeAssessmentExcluded
-								ndd.Phase = phaseStatePaused
-							case configv1alpha1.NodeUpdateStatusUpdatingReasonCompleted:
-								ndd.isUpdated = true
-								ndd.Assessment = nodeAssessmentCompleted
-							case configv1alpha1.NodeUpdateStatusUpdatingReasonPending:
-								ndd.Assessment = nodeAssessmentOutdated
-								ndd.Phase = phaseStatePending
-							}
-						}
-
-						if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeAvailable); c != nil {
-							ndd.isUnavailable = c.Status == metav1.ConditionFalse
-						}
-
-						if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeDegraded); c != nil {
-							ndd.isDegraded = c.Status == metav1.ConditionTrue
-						}
-
-						if ndd.Assessment == nodeAssessmentOutdated {
-							controlPlanePoolStatusData.NodesOverview.Outdated++
-						}
-						if ndd.Phase == phaseStateDraining {
-							controlPlanePoolStatusData.NodesOverview.Draining++
-						}
-						if ndd.isUnavailable {
-							ndd.Assessment = nodeAssessmentUnavailable
-						} else {
-							controlPlanePoolStatusData.NodesOverview.Available++
-						}
-						if ndd.isUpdating {
-							controlPlanePoolStatusData.NodesOverview.Progressing++
-						}
-						if ndd.isDegraded {
-							controlPlanePoolStatusData.NodesOverview.Degraded++
-							ndd.Assessment = nodeAssessmentDegraded
-						}
-					}
-				}
-			}
-		}
+		// if cpPool := us.Status.ControlPlane.Nodes; cpPool != nil {
+		// 	controlPlanePoolStatusData = poolDisplayData{
+		// 		Name:       cpPool.Resource.Name,
+		// 		Assessment: "",
+		// 		Completion: 0,
+		// 		Duration:   0,
+		// 		NodesOverview: nodesOverviewDisplayData{
+		// 			Total:       0,
+		// 			Available:   0,
+		// 			Progressing: 0,
+		// 			Outdated:    0,
+		// 			Draining:    0,
+		// 			Excluded:    0,
+		// 			Degraded:    0,
+		// 		},
+		// 		Nodes: nil,
+		// 	}
+		// 	for _, node := range cpPool.Nodes {
+		// 		ndd := nodeDisplayData{
+		// 			Name:     node.Resource.Name,
+		// 			Version:  node.Version,
+		// 			Estimate: shortDuration(node.EstToComplete.Duration),
+		// 			Message:  node.Message,
+		// 		}
+		//
+		// 		controlPlanePoolStatusData.NodesOverview.Total++
+		//
+		// 		if node.Conditions != nil {
+		//
+		// 			if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeUpdating); c != nil {
+		// 				if c.Status == metav1.ConditionTrue {
+		// 					ndd.isUpdating = true
+		// 					ndd.Assessment = nodeAssessmentProgressing
+		//
+		// 					switch c.Reason {
+		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonDraining:
+		// 						ndd.Phase = phaseStateDraining
+		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonUpdating:
+		// 						ndd.Phase = phaseStateUpdating
+		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonRebooting:
+		// 						ndd.Phase = phaseStateRebooting
+		// 					}
+		// 				}
+		//
+		// 				if c.Status == metav1.ConditionFalse {
+		// 					ndd.isUpdating = false
+		// 					switch c.Reason {
+		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonPaused:
+		// 						ndd.Assessment = nodeAssessmentExcluded
+		// 						ndd.Phase = phaseStatePaused
+		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonCompleted:
+		// 						ndd.isUpdated = true
+		// 						ndd.Assessment = nodeAssessmentCompleted
+		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonPending:
+		// 						ndd.Assessment = nodeAssessmentOutdated
+		// 						ndd.Phase = phaseStatePending
+		// 					}
+		// 				}
+		//
+		// 				if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeAvailable); c != nil {
+		// 					ndd.isUnavailable = c.Status == metav1.ConditionFalse
+		// 				}
+		//
+		// 				if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeDegraded); c != nil {
+		// 					ndd.isDegraded = c.Status == metav1.ConditionTrue
+		// 				}
+		//
+		// 				if ndd.Assessment == nodeAssessmentOutdated {
+		// 					controlPlanePoolStatusData.NodesOverview.Outdated++
+		// 				}
+		// 				if ndd.Phase == phaseStateDraining {
+		// 					controlPlanePoolStatusData.NodesOverview.Draining++
+		// 				}
+		// 				if ndd.isUnavailable {
+		// 					ndd.Assessment = nodeAssessmentUnavailable
+		// 				} else {
+		// 					controlPlanePoolStatusData.NodesOverview.Available++
+		// 				}
+		// 				if ndd.isUpdating {
+		// 					controlPlanePoolStatusData.NodesOverview.Progressing++
+		// 				}
+		// 				if ndd.isDegraded {
+		// 					controlPlanePoolStatusData.NodesOverview.Degraded++
+		// 					ndd.Assessment = nodeAssessmentDegraded
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
 	if !controlPlaneUpdating && !isWorkerPoolOutdated {
@@ -536,11 +569,12 @@ func findClusterOperatorStatusCondition(conditions []configv1.ClusterOperatorSta
 	return nil
 }
 
-func findCondition(conditions []metav1.Condition, name string) *metav1.Condition {
-	for i := range conditions {
-		if conditions[i].Type == name {
-			return &conditions[i]
+func findClusterVersionInsight(insights []configv1alpha1.UpdateInsight) *configv1alpha1.ClusterVersionStatusInsight {
+	for i := range insights {
+		if insights[i].Type == configv1alpha1.UpdateInsightTypeClusterVersionStatusInsight {
+			return insights[i].ClusterVersionStatusInsight
 		}
 	}
+
 	return nil
 }

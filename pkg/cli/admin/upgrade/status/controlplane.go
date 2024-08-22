@@ -269,10 +269,10 @@ func assessControlPlaneStatus(cv *v1.ClusterVersion, operators []v1.ClusterOpera
 		toLastObservedProgress = lastObservedProgress.Sub(started)
 		if currentHistoryItem.State == v1.CompletedUpdate {
 			displayData.CompletionAt = currentHistoryItem.CompletionTime.Time
+			updatingFor = displayData.CompletionAt.Sub(started)
 		} else {
-			displayData.CompletionAt = at
+			updatingFor = at.Sub(started)
 		}
-		updatingFor = displayData.CompletionAt.Sub(started)
 		// precision to seconds when under 60s
 		if updatingFor > 10*time.Minute {
 			displayData.Duration = updatingFor.Round(time.Minute)
@@ -433,7 +433,7 @@ var controlPlaneStatusTemplate = template.Must(
 		Parse(controlPlaneStatusTemplateRaw))
 
 func (d *controlPlaneStatusDisplayData) Write(f io.Writer) error {
-	if d.Operators.Updated == d.Operators.Total {
+	if !d.CompletionAt.IsZero() {
 		_, err := f.Write([]byte(fmt.Sprintf("= Control Plane =\nUpdate to %s successfully completed at %s (duration: %s)\n", d.TargetVersion.target, d.CompletionAt.UTC().Format(time.RFC3339), shortDuration(d.Duration))))
 		return err
 	}

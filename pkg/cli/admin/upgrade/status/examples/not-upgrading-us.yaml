@@ -5,15 +5,31 @@ metadata:
 spec: {}
 status:
   controlPlane:
-    assessment: Progressing
-    completion: 0
+    informers:
+    - name: ota-1268-prototype
+      insights:
+      - type: ClusterVersion
+        cv:
+          resource:
+            apiGroup: config.openshift.io/v1
+            kind: ClusterVersion
+            name: version
+          conditions:
+          - lastTransitionTime: "2023-11-02T13:09:35Z"
+            message: Cluster version is 4.14.1
+            status: "False"
+            type: Updating
+          versions:
+            target: 4.14.1
+            targetInstall: true
+
+          startedAt: "2023-11-02T12:48:56Z"
+          completedAt: "2023-11-02T13:09:35Z"
+          assessment: Completed
+          completion: 0
     conditions:
     - lastTransitionTime: "2023-11-02T13:09:35Z"
       message: Cluster version is 4.14.1
-      reason: ClusterVersionProgressing
+      reason: ClusterVersionNotProgressing
       status: "False"
-      type: UpdateProgressing
-    startedAt: "2023-11-02T12:48:56Z"
-    versions:
-      target: 4.14.1
-      targetInstall: true
+      type: Updating
