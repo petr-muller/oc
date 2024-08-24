@@ -22,11 +22,407 @@ status:
           versions:
             target: 4.14.1
             targetInstall: true
-
           startedAt: "2023-11-02T12:48:56Z"
           completedAt: "2023-11-02T13:09:35Z"
           assessment: Completed
-          completion: 0
+          completion: 100
+      - type: ClusterOperator
+        co:
+          name: authentication
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: baremetal
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: cloud-controller-manager
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: cloud-credential
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: cluster-api
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: cluster-autoscaler
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: config-operator
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: console
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: control-plane-machine-set
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: csi-snapshot-controller
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: dns
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: etcd
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: image-registry
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: ingress
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: insights
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: kube-apiserver
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: kube-controller-manager
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: kube-scheduler
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: kube-storage-version-migrator
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: machine-api
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: machine-approver
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: machine-config
+          conditions:
+          - type: Healthy
+            status: "False"
+            reason: Degraded
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: marketplace
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: monitoring
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: network
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: node-tuning
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: olm
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: openshift-apiserver
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: openshift-controller-manager
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: openshift-samples
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: operator-lifecycle-manager
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: operator-lifecycle-manager-catalog
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: operator-lifecycle-manager-packageserver
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: platform-operators-aggregated
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: service-ca
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
+      - type: ClusterOperator
+        co:
+          name: storage
+          conditions:
+          - type: Healthy
+            status: "True"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+          - type: Updating
+            status: "False"
+            lastTransitionTime: "2023-11-02T13:09:35Z"
+            reason: Updated
     conditions:
     - lastTransitionTime: "2023-11-02T13:09:35Z"
       message: Cluster version is 4.14.1

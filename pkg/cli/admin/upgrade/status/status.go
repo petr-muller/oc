@@ -416,40 +416,45 @@ func (o *options) Run(ctx context.Context) error {
 		cpStatusDisplayData.EstTimeToComplete = cvInsight.EstimatedCompletedAt.Time.Sub(now).Round(time.Second)
 		cpStatusDisplayData.EstDuration = cvInsight.EstimatedCompletedAt.Time.Sub(startedAt).Round(time.Second)
 
-		// for _, co := range us.Status.ControlPlane.Operators {
-		// 	if updating := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeUpdating); updating != nil {
-		// 		switch updating.Status {
-		// 		case metav1.ConditionTrue:
-		// 			cpStatusDisplayData.Operators.Updating++
-		// 		case metav1.ConditionFalse:
-		// 			switch updating.Reason {
-		// 			case configv1alpha1.OperatorUpdateStatusUpdatingReasonUpdated:
-		// 				cpStatusDisplayData.Operators.Updated++
-		// 			case configv1alpha1.OperatorUpdateStatusUpdatingReasonPending:
-		// 				cpStatusDisplayData.Operators.Waiting++
-		// 			default:
-		// 			}
-		// 		case metav1.ConditionUnknown:
-		// 		default:
-		// 		}
-		// 	}
-		// 	cpStatusDisplayData.Operators.Total++
-		// 	if healthy := findCondition(co.Conditions, configv1alpha1.OperatorUpdateStatusConditionTypeHealthy); healthy != nil {
-		// 		switch healthy.Status {
-		// 		case metav1.ConditionFalse:
-		// 			switch healthy.Reason {
-		// 			case configv1alpha1.OperatorUpdateStatusHealthyReasonDegraded:
-		// 				cpStatusDisplayData.Operators.Degraded++
-		// 			case configv1alpha1.OperatorUpdateStatusHealthyReasonUnavailable:
-		// 				cpStatusDisplayData.Operators.Unavailable++
-		// 			default:
-		// 			}
-		// 		case metav1.ConditionTrue:
-		// 		case metav1.ConditionUnknown:
-		// 		default:
-		// 		}
-		// 	}
-		// }
+		for _, informer := range us.Status.ControlPlane.Informers {
+			for _, insight := range informer.Insights {
+				if insight.Type == configv1alpha1.UpdateInsightTypeClusterOperatorStatusInsight {
+					coInsight := insight.ClusterOperatorStatusInsight
+					if updating := meta.FindStatusCondition(coInsight.Conditions, string(configv1alpha1.ClusterOperatorStatusInsightConditionTypeUpdating)); updating != nil {
+						switch updating.Status {
+						case metav1.ConditionTrue:
+							cpStatusDisplayData.Operators.Updating++
+						case metav1.ConditionFalse:
+							switch updating.Reason {
+							case string(configv1alpha1.ClusterOperatorStatusInsightUpdatingReasonUpdated):
+								cpStatusDisplayData.Operators.Updated++
+							case string(configv1alpha1.ClusterOperatorStatusInsightUpdatingReasonPending):
+								cpStatusDisplayData.Operators.Waiting++
+							default:
+							}
+						case metav1.ConditionUnknown:
+						default:
+						}
+					}
+					cpStatusDisplayData.Operators.Total++
+					if healthy := meta.FindStatusCondition(coInsight.Conditions, string(configv1alpha1.ClusterOperatorStatusInsightConditionTypeHealthy)); healthy != nil {
+						switch healthy.Status {
+						case metav1.ConditionFalse:
+							switch healthy.Reason {
+							case string(configv1alpha1.ClusterOperatorUpdateStatusInsightHealthyReasonDegraded):
+								cpStatusDisplayData.Operators.Degraded++
+							case string(configv1alpha1.ClusterOperatorUpdateStatusInsightHealthyReasonUnavailable):
+								cpStatusDisplayData.Operators.Unavailable++
+							default:
+							}
+						case metav1.ConditionTrue:
+						case metav1.ConditionUnknown:
+						default:
+						}
+					}
+				}
+			}
+		}
 
 		// if cpPool := us.Status.ControlPlane.Nodes; cpPool != nil {
 		// 	controlPlanePoolStatusData = poolDisplayData{
