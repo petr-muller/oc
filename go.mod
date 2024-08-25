@@ -211,4 +211,4 @@ require (
 
 replace github.com/apcera/gssapi => github.com/openshift/gssapi v0.0.0-20161010215902-5fb4217df13b
 
-replace github.com/openshift/api => github.com/petr-muller/api update-status-operator
+replace github.com/openshift/api => github.com/petr-muller/api v0.0.0-20240825134317-d07794135bff
