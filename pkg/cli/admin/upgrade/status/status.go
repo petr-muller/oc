@@ -541,6 +541,7 @@ func displayDataFromNodeInsight(pdd *poolDisplayData, nodeInsight *configv1alpha
 		case string(configv1alpha1.NodeStatusInsightUpdatingReasonCompleted):
 			ndd.isUpdated = true
 			ndd.Assessment = nodeAssessmentCompleted
+			ndd.Phase = phaseStateUpdated
 			zeroEst = "-"
 		case string(configv1alpha1.NodeStatusInsightUpdatingReasonPending):
 			ndd.Assessment = nodeAssessmentOutdated
