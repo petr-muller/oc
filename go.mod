@@ -37,7 +37,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/openshift/api v0.0.0-20240823112050-2b42490270d8
 	github.com/openshift/build-machinery-go v0.0.0-20240419090851-af9c868bcf52
-	github.com/openshift/client-go v0.0.0-20240528061634-b054aa794d87
+	github.com/openshift/client-go v0.0.0-20240821135114-75c118605d5f
 	github.com/openshift/library-go v0.0.0-20240528110646-354b673304be
 	github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8
 	github.com/pkg/errors v0.9.1
