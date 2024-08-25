@@ -12,6 +12,7 @@ ip-10-0-8-37.ec2.internal   Outdated     Pending   4.16.0-0.nightly-2024-08-01-0
 = Worker Upgrade =
 
 WORKER POOL   ASSESSMENT   COMPLETION   STATUS
+worker        Empty                     0 Total
 
 = Update Health =
 SINCE   LEVEL   IMPACT   MESSAGE

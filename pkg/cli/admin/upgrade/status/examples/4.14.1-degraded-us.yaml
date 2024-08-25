@@ -494,3 +494,106 @@ status:
       reason: ClusterVersionProgressing
       status: "True"
       type: Updating
+  workerPools:
+  - name: worker
+    resource:
+      apiGroup: machineconfiguration.openshift.io/v1
+      kind: MachineConfigPool
+      name: worker
+    informers:
+    - name: prototype-ota-1258
+      insights:
+      - type: MachineConfigPool
+        mcp:
+          assessment: Pending
+          completion: 0
+          name: "worker"
+          resource:
+            apiGroup: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            name: worker
+          scopeType: WorkerPool
+          summaries:
+          - type: Total
+            count: 3
+          - type: Available
+            count: 3
+          - type: Progressing
+            count: 0
+          - type: Outdated
+            count: 3
+          - type: Draining
+            count: 0
+          - type: Excluded
+            count: 0
+          - type: Degraded
+            count: 0
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: ip-10-0-20-162.us-east-2.compute.internal
+          name: ip-10-0-20-162.us-east-2.compute.internal
+          version: 4.14.0-rc.3
+          conditions:
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is pending an update"
+            reason: Pending
+            status: "False"
+            type: Updating
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is not degraded"
+            reason: "AllIsWell"
+            status: "False"
+            type: Degraded
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is available"
+            reason: "AllIsWell"
+            status: "True"
+            type: Available
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: ip-10-0-4-159.us-east-2.compute.internal
+          name: ip-10-0-4-159.us-east-2.compute.internal
+          version: 4.14.0-rc.3
+          conditions:
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is pending an update"
+            reason: Pending
+            status: "False"
+            type: Updating
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is not degraded"
+            reason: "AllIsWell"
+            status: "False"
+            type: Degraded
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is available"
+            reason: "AllIsWell"
+            status: "True"
+            type: Available
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: ip-10-0-99-40.us-east-2.compute.internal
+          name: ip-10-0-99-40.us-east-2.compute.internal
+          version: 4.14.0-rc.3
+          conditions:
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is pending an update"
+            reason: Pending
+            status: "False"
+            type: Updating
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is not degraded"
+            reason: "AllIsWell"
+            status: "False"
+            type: Degraded
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is available"
+            reason: "AllIsWell"
+            status: "True"
+            type: Available

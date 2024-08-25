@@ -458,3 +458,37 @@ status:
       reason: ClusterVersionProgressing
       status: "True"
       type: Updating
+  workerPools:
+  - name: worker
+    resource:
+      apiGroup: machineconfiguration.openshift.io/v1
+      kind: MachineConfigPool
+      name: worker
+    informers:
+    - name: ota-1268-prototype
+      insights:
+      - type: MachineConfigPool
+        mcp:
+          assessment: Empty
+          completion: 0
+          name: "worker"
+          resource:
+            apiGroup: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            name: "worker"
+          scopeType: WorkerPool
+          summaries:
+          - type: Total
+            count: 0
+          - type: Available
+            count: 0
+          - type: Progressing
+            count: 0
+          - type: Outdated
+            count: 0
+          - type: Draining
+            count: 0
+          - type: Excluded
+            count: 0
+          - type: Degraded
+            count: 0

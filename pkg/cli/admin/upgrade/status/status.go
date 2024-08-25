@@ -298,12 +298,6 @@ func (o *options) Run(ctx context.Context) error {
 			}
 		}
 
-		for _, pool := range workerPoolsStatusData {
-			if pool.NodesOverview.Total > 0 && pool.Completion != 100 {
-				isWorkerPoolOutdated = true
-				break
-			}
-		}
 		progressing := findClusterOperatorStatusCondition(cv.Status.Conditions, configv1.OperatorProgressing)
 		if progressing == nil {
 			return fmt.Errorf("no current %s info, see `oc describe clusterversion` for more details.\n", configv1.OperatorProgressing)
@@ -455,89 +449,37 @@ func (o *options) Run(ctx context.Context) error {
 				}
 				if insight.Type == configv1alpha1.UpdateInsightTypeMachineConfigPoolStatusInsight {
 					mcpInsight := insight.MachineConfigPoolStatusInsight
-					controlPlanePoolStatusData.Name = mcpInsight.Name
-					controlPlanePoolStatusData.Assessment = assessmentState(mcpInsight.Assessment)
-					controlPlanePoolStatusData.Completion = float64(mcpInsight.Completion)
-					for _, summary := range mcpInsight.Summaries {
-						switch summary.Type {
-						case configv1alpha1.PoolNodesSummaryTypeTotal:
-							controlPlanePoolStatusData.NodesOverview.Total = int(summary.Count)
-						case configv1alpha1.PoolNodesSummaryTypeAvailable:
-							controlPlanePoolStatusData.NodesOverview.Available = int(summary.Count)
-						case configv1alpha1.PoolNodesSummaryTypeProgressing:
-							controlPlanePoolStatusData.NodesOverview.Progressing = int(summary.Count)
-						case configv1alpha1.PoolNodesSummaryTypeOutdated:
-							controlPlanePoolStatusData.NodesOverview.Outdated = int(summary.Count)
-						case configv1alpha1.PoolNodesSummaryTypeDraining:
-							controlPlanePoolStatusData.NodesOverview.Draining = int(summary.Count)
-						case configv1alpha1.PoolNodesSummaryTypeExcluded:
-							controlPlanePoolStatusData.NodesOverview.Excluded = int(summary.Count)
-						case configv1alpha1.PoolNodesSummaryTypeDegraded:
-							controlPlanePoolStatusData.NodesOverview.Degraded = int(summary.Count)
-						}
-					}
+					displayDataFromMachineConfigPoolInsight(&controlPlanePoolStatusData, mcpInsight)
 				}
 				if insight.Type == configv1alpha1.UpdateInsightTypeNodeStatusInsight {
 					nodeInsight := insight.NodeStatusInsight
-					updating := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeUpdating))
-					available := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeAvailable))
-					degraded := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeDegraded))
-
-					ndd := nodeDisplayData{
-						Name:    nodeInsight.Name,
-						Version: nodeInsight.Version,
-						Message: nodeInsight.Message,
-					}
-
-					zeroEst := "?" // unknown
-					if updating != nil && updating.Status == metav1.ConditionTrue {
-						ndd.isUpdating = true
-						ndd.Assessment = nodeAssessmentProgressing
-						switch updating.Reason {
-						case string(configv1alpha1.NodeStatusInsightUpdatingReasonDraining):
-							ndd.Phase = phaseStateDraining
-						case string(configv1alpha1.NodeStatusInsightUpdatingReasonUpdating):
-							ndd.Phase = phaseStateUpdating
-						case string(configv1alpha1.NodeStatusInsightUpdatingReasonRebooting):
-							ndd.Phase = phaseStateRebooting
-						}
-
-					}
-
-					if updating != nil && updating.Status == metav1.ConditionFalse {
-						ndd.isUpdating = false
-						switch updating.Reason {
-						case string(configv1alpha1.NodeStatusInsightUpdatingReasonPaused):
-							ndd.Assessment = nodeAssessmentExcluded
-							ndd.Phase = phaseStatePaused
-							zeroEst = "-"
-						case string(configv1alpha1.NodeStatusInsightUpdatingReasonCompleted):
-							ndd.isUpdated = true
-							ndd.Assessment = nodeAssessmentCompleted
-							zeroEst = "-"
-						case string(configv1alpha1.NodeStatusInsightUpdatingReasonPending):
-							ndd.Assessment = nodeAssessmentOutdated
-							ndd.Phase = phaseStatePending
-						}
-					}
-
-					if available != nil {
-						ndd.isUnavailable = available.Status == metav1.ConditionFalse
-					}
-
-					if degraded != nil {
-						ndd.isDegraded = degraded.Status == metav1.ConditionTrue
-					}
-
-					if nodeInsight.EstToComplete.Duration == 0 || ndd.isDegraded || ndd.isUnavailable {
-						ndd.Estimate = zeroEst
-					} else {
-						ndd.Estimate = "+" + shortDuration(nodeInsight.EstToComplete.Duration)
-					}
-
-					controlPlanePoolStatusData.Nodes = append(controlPlanePoolStatusData.Nodes, ndd)
+					displayDataFromNodeInsight(&controlPlanePoolStatusData, nodeInsight)
 				}
 			}
+		}
+
+		for _, pool := range us.Status.WorkerPools {
+			var pdd poolDisplayData
+			for _, informer := range pool.Informers {
+				for _, insight := range informer.Insights {
+					switch insight.Type {
+					case configv1alpha1.UpdateInsightTypeMachineConfigPoolStatusInsight:
+						mcpInsight := insight.MachineConfigPoolStatusInsight
+						displayDataFromMachineConfigPoolInsight(&pdd, mcpInsight)
+					case configv1alpha1.UpdateInsightTypeNodeStatusInsight:
+						nodeInsight := insight.NodeStatusInsight
+						displayDataFromNodeInsight(&pdd, nodeInsight)
+					}
+				}
+			}
+			workerPoolsStatusData = append(workerPoolsStatusData, pdd)
+		}
+	}
+
+	for _, pool := range workerPoolsStatusData {
+		if pool.NodesOverview.Total > 0 && pool.Completion != 100 {
+			isWorkerPoolOutdated = true
+			break
 		}
 	}
 
@@ -561,6 +503,90 @@ func (o *options) Run(ctx context.Context) error {
 	upgradeHealth, allowDetailed := assessUpdateInsights(updateInsights, updatingFor, now)
 	_ = upgradeHealth.Write(o.Out, allowDetailed && o.enabledDetailed(detailedOutputHealth))
 	return nil
+}
+
+func displayDataFromNodeInsight(pdd *poolDisplayData, nodeInsight *configv1alpha1.NodeStatusInsight) {
+	updating := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeUpdating))
+	available := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeAvailable))
+	degraded := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeDegraded))
+
+	ndd := nodeDisplayData{
+		Name:    nodeInsight.Name,
+		Version: nodeInsight.Version,
+		Message: nodeInsight.Message,
+	}
+
+	zeroEst := "?" // unknown
+	if updating != nil && updating.Status == metav1.ConditionTrue {
+		ndd.isUpdating = true
+		ndd.Assessment = nodeAssessmentProgressing
+		switch updating.Reason {
+		case string(configv1alpha1.NodeStatusInsightUpdatingReasonDraining):
+			ndd.Phase = phaseStateDraining
+		case string(configv1alpha1.NodeStatusInsightUpdatingReasonUpdating):
+			ndd.Phase = phaseStateUpdating
+		case string(configv1alpha1.NodeStatusInsightUpdatingReasonRebooting):
+			ndd.Phase = phaseStateRebooting
+		}
+
+	}
+
+	if updating != nil && updating.Status == metav1.ConditionFalse {
+		ndd.isUpdating = false
+		switch updating.Reason {
+		case string(configv1alpha1.NodeStatusInsightUpdatingReasonPaused):
+			ndd.Assessment = nodeAssessmentExcluded
+			ndd.Phase = phaseStatePaused
+			zeroEst = "-"
+		case string(configv1alpha1.NodeStatusInsightUpdatingReasonCompleted):
+			ndd.isUpdated = true
+			ndd.Assessment = nodeAssessmentCompleted
+			zeroEst = "-"
+		case string(configv1alpha1.NodeStatusInsightUpdatingReasonPending):
+			ndd.Assessment = nodeAssessmentOutdated
+			ndd.Phase = phaseStatePending
+		}
+	}
+
+	if available != nil {
+		ndd.isUnavailable = available.Status == metav1.ConditionFalse
+	}
+
+	if degraded != nil {
+		ndd.isDegraded = degraded.Status == metav1.ConditionTrue
+	}
+
+	if nodeInsight.EstToComplete.Duration == 0 || ndd.isDegraded || ndd.isUnavailable {
+		ndd.Estimate = zeroEst
+	} else {
+		ndd.Estimate = "+" + shortDuration(nodeInsight.EstToComplete.Duration)
+	}
+
+	pdd.Nodes = append(pdd.Nodes, ndd)
+}
+
+func displayDataFromMachineConfigPoolInsight(controlPlanePoolStatusData *poolDisplayData, mcpInsight *configv1alpha1.MachineConfigPoolStatusInsight) {
+	controlPlanePoolStatusData.Name = mcpInsight.Name
+	controlPlanePoolStatusData.Assessment = assessmentState(mcpInsight.Assessment)
+	controlPlanePoolStatusData.Completion = float64(mcpInsight.Completion)
+	for _, summary := range mcpInsight.Summaries {
+		switch summary.Type {
+		case configv1alpha1.PoolNodesSummaryTypeTotal:
+			controlPlanePoolStatusData.NodesOverview.Total = int(summary.Count)
+		case configv1alpha1.PoolNodesSummaryTypeAvailable:
+			controlPlanePoolStatusData.NodesOverview.Available = int(summary.Count)
+		case configv1alpha1.PoolNodesSummaryTypeProgressing:
+			controlPlanePoolStatusData.NodesOverview.Progressing = int(summary.Count)
+		case configv1alpha1.PoolNodesSummaryTypeOutdated:
+			controlPlanePoolStatusData.NodesOverview.Outdated = int(summary.Count)
+		case configv1alpha1.PoolNodesSummaryTypeDraining:
+			controlPlanePoolStatusData.NodesOverview.Draining = int(summary.Count)
+		case configv1alpha1.PoolNodesSummaryTypeExcluded:
+			controlPlanePoolStatusData.NodesOverview.Excluded = int(summary.Count)
+		case configv1alpha1.PoolNodesSummaryTypeDegraded:
+			controlPlanePoolStatusData.NodesOverview.Degraded = int(summary.Count)
+		}
+	}
 }
 
 func findClusterOperatorStatusCondition(conditions []configv1.ClusterOperatorStatusCondition, name configv1.ClusterStatusConditionType) *configv1.ClusterOperatorStatusCondition {
