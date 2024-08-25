@@ -8,6 +8,105 @@ status:
     informers:
     - name: ota-1268-prototype
       insights:
+      - type: UpdateHealth
+        health:
+          impact:
+            description: 'NodeControllerDegraded: The master nodes not ready: node "ip-10-0-12-74.ec2.internal" not ready since 2023-11-03 16:28:43 +0000 UTC because KubeletNotReady (container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: No CNI configuration file in /etc/kubernetes/cni/net.d/. Has your network provider started?)'
+            level: error
+            summary: 'Cluster Operator kube-apiserver is degraded (NodeController_MasterNodesReady)'
+            type: API Availability
+          remediation:
+            reference: "https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/ClusterOperatorDegraded.md"
+          scope:
+            type: ControlPlane
+            resources:
+            - name: kube-apiserver
+              kind: ClusterOperator
+              apiGroup: config.openshift.io/v1
+          startedAt: "2023-11-03T16:28:46Z"
+      - type: UpdateHealth
+        health:
+          impact:
+            description: 'NodeControllerDegraded: The master nodes not ready: node "ip-10-0-12-74.ec2.internal" not ready since 2023-11-03 16:28:43 +0000 UTC because KubeletNotReady (container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: No CNI configuration file in /etc/kubernetes/cni/net.d/. Has your network provider started?)/etc/kubernetes/cni/net.d/. Has your network provider started?)'
+            level: error
+            summary: 'Cluster Operator kube-controller-manager is degraded (NodeController_MasterNodesReady)'
+            type: API Availability
+          remediation:
+            reference: "https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/ClusterOperatorDegraded.md"
+          scope:
+            type: ControlPlane
+            resources:
+            - name: kube-controller-manager
+              kind: ClusterOperator
+              apiGroup: config.openshift.io/v1
+          startedAt: "2023-11-03T16:28:46Z"
+      - type: UpdateHealth
+        health:
+          impact:
+            description: 'NodeControllerDegraded: The master nodes not ready: node "ip-10-0-12-74.ec2.internal" not ready since 2023-11-03 16:28:43 +0000 UTC because KubeletNotReady (container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: No CNI configuration file in /etc/kubernetes/cni/net.d/. Has your network provider started?)/etc/kubernetes/cni/net.d/. Has your network provider started?)'
+            level: error
+            summary: 'Cluster Operator kube-scheduler is degraded (NodeController_MasterNodesReady)'
+            type: API Availability
+          remediation:
+            reference: "https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/ClusterOperatorDegraded.md"
+          scope:
+            type: ControlPlane
+            resources:
+            - name: kube-scheduler
+              kind: ClusterOperator
+              apiGroup: config.openshift.io/v1
+          startedAt: "2023-11-03T16:28:46Z"
+      - type: UpdateHealth
+        health:
+          impact:
+            description: |
+              EtcdEndpointsDegraded: EtcdEndpointsController can't evaluate whether quorum is safe: etcd cluster has quorum of 2 and 2 healthy members which is not fault tolerant: [{Member:ID:12895393557789359222 name:"ip-10-0-73-118.ec2.internal" peerURLs:"https://10.0.73.118:2380" clientURLs:"https://10.0.73.118:2379"  Healthy:true Took:1.725492ms Error:<nil>} {Member:ID:13608765340770574953 name:"ip-10-0-0-60.ec2.internal" peerURLs:"https://10.0.0.60:2380" clientURLs:"https://10.0.0.60:2379"  Healthy:true Took:1.542919ms Error:<nil>} {Member:ID:18044478200504924924 name:"ip-10-0-12-74.ec2.internal" peerURLs:"https://10.0.12.74:2380" clientURLs:"https://10.0.12.74:2379"  Healthy:false Took: Error:create client failure: failed to make etcd client for endpoints [https://10.0.12.74:2379]: context deadline exceeded}]
+              , EtcdMembersDegraded: 2 of 3 members are available, ip-10-0-12-74.ec2.internal is unhealthy
+              , NodeControllerDegraded: The master nodes not ready: node "ip-10-0-12-74.ec2.internal" not ready since 2023-11-03 16:28:43 +0000 UTC because KubeletNotReady (container runtime network not ready: NetworkReady=false reason:NetworkPluginNotReady message:Network plugin returns error: No CNI configuration file in /etc/kubernetes/cni/net.d/. Has your network provider started?)/etc/kubernetes/cni/net.d/. Has your network provider started?)
+            level: error
+            summary: 'Cluster Operator etcd is degraded (EtcdEndpoints_ErrorUpdatingEtcdEndpoints::EtcdMembers_UnhealthyMembers::NodeController_MasterNodesReady)'
+            type: API Availability
+          remediation:
+            reference: "https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/ClusterOperatorDegraded.md"
+          scope:
+            type: ControlPlane
+            resources:
+            - name: etcd
+              kind: ClusterOperator
+              apiGroup: config.openshift.io/v1
+          startedAt: "2023-11-03T16:28:26Z"
+      - type: UpdateHealth
+        health:
+          impact:
+            description: 'Missing 1 available replica(s)'
+            level: error
+            summary: 'Cluster Operator control-plane-machine-set is unavailable (UnavailableReplicas)'
+            type: API Availability
+          remediation:
+            reference: "https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/ClusterOperatorDegraded.md"
+          scope:
+            type: ControlPlane
+            resources:
+            - name: control-plane-machine-set
+              kind: ClusterOperator
+              apiGroup: config.openshift.io/v1
+          startedAt: "2023-11-03T16:26:47Z"
+      - type: UpdateHealth
+        health:
+          impact:
+            description: Cluster operators etcd, kube-apiserver are degrad
+            level: warning
+            summary: 'Cluster Version version is failing to proceed with the update (ClusterOperatorsDegraded)'
+            type: Update Stalled
+          remediation:
+            reference: "https://github.com/openshift/runbooks/blob/master/alerts/cluster-monitoring-operator/ClusterOperatorDegraded.md"
+          scope:
+            type: ControlPlane
+            resources:
+            - name: version
+              kind: ClusterVersion
+              apiGroup: config.openshift.io/v1
+          startedAt: "2023-11-03T17:27:04Z"
       - type: MachineConfigPool
         mcp:
           assessment: Pending

@@ -455,6 +455,9 @@ func (o *options) Run(ctx context.Context) error {
 					nodeInsight := insight.NodeStatusInsight
 					displayDataFromNodeInsight(&controlPlanePoolStatusData, nodeInsight)
 				}
+				if insight.Type == configv1alpha1.UpdateInsightTypeUpdateHealthInsight {
+					updateInsights = append(updateInsights, toUpdateInsight(insight.UpdateHealthInsight))
+				}
 			}
 		}
 
@@ -469,6 +472,8 @@ func (o *options) Run(ctx context.Context) error {
 					case configv1alpha1.UpdateInsightTypeNodeStatusInsight:
 						nodeInsight := insight.NodeStatusInsight
 						displayDataFromNodeInsight(&pdd, nodeInsight)
+					case configv1alpha1.UpdateInsightTypeUpdateHealthInsight:
+						updateInsights = append(updateInsights, toUpdateInsight(insight.UpdateHealthInsight))
 					}
 				}
 			}
@@ -503,6 +508,54 @@ func (o *options) Run(ctx context.Context) error {
 	upgradeHealth, allowDetailed := assessUpdateInsights(updateInsights, updatingFor, now)
 	_ = upgradeHealth.Write(o.Out, allowDetailed && o.enabledDetailed(detailedOutputHealth))
 	return nil
+}
+
+func toUpdateInsight(apiInsight *configv1alpha1.UpdateHealthInsight) updateInsight {
+	var resources []scopeResource
+	for _, resource := range apiInsight.Scope.Resources {
+		resources = append(resources, scopeResource{
+			kind: scopeGroupKind{
+				group: resource.APIGroup,
+				kind:  resource.Kind,
+			},
+			name:      resource.Name,
+			namespace: resource.Namespace,
+		})
+	}
+
+	insight := updateInsight{
+		startedAt: apiInsight.StartedAt.Time,
+		scope: updateInsightScope{
+			scopeType: scopeType(apiInsight.Scope.Type),
+			resources: resources,
+		},
+		impact: updateInsightImpact{
+			level:       toImpactLevel(apiInsight.Impact.Level),
+			impactType:  impactType(apiInsight.Impact.Type),
+			summary:     apiInsight.Impact.Summary,
+			description: apiInsight.Impact.Description,
+		},
+		remediation: updateInsightRemediation{
+			reference: apiInsight.Remediation.Reference,
+		},
+	}
+
+	return insight
+}
+
+func toImpactLevel(level configv1alpha1.InsightImpactLevel) impactLevel {
+	switch level {
+	case configv1alpha1.InfoImpactLevel:
+		return infoImpactLevel
+	case configv1alpha1.WarningImpactLevel:
+		return warningImpactLevel
+	case configv1alpha1.ErrorImpactLevel:
+		return errorImpactLevel
+	case configv1alpha1.CriticalInfoLevel:
+		return criticalInfoLevel
+	}
+
+	return infoImpactLevel
 }
 
 func displayDataFromNodeInsight(pdd *poolDisplayData, nodeInsight *configv1alpha1.NodeStatusInsight) {
