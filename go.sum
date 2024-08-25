@@ -490,8 +490,6 @@ github.com/opencontainers/selinux v1.11.0 h1:+5Zbo97w3Lbmb3PeqQtpmTkMwsW5nRI3YaL
 github.com/opencontainers/selinux v1.11.0/go.mod h1:E5dMC3VPuVvVHDYmi78qvhJp8+M586T4DlDRYpFkyec=
 github.com/openshift/build-machinery-go v0.0.0-20240419090851-af9c868bcf52 h1:bqBwrXG7sbJUqP1Og1bR8FvVh7qb7CrMgy9saKmOZFs=
 github.com/openshift/build-machinery-go v0.0.0-20240419090851-af9c868bcf52/go.mod h1:b1BuldmJlbA/xYtdZvKi+7j5YGB44qJUJDZ9zwiNCfE=
-github.com/openshift/client-go v0.0.0-20240821135114-75c118605d5f h1:iYIcy36QilP/1KeiVYeqXP9oLsP2gCytGIG5+doS7x8=
-github.com/openshift/client-go v0.0.0-20240821135114-75c118605d5f/go.mod h1:3IPD4U0qyovZS4EFady2kqY32m8lGcbs/Wx+yprg9z8=
 github.com/openshift/gssapi v0.0.0-20161010215902-5fb4217df13b h1:it0YPE/evO6/m8t8wxis9KFI2F/aleOKsI6d9uz0cEk=
 github.com/openshift/gssapi v0.0.0-20161010215902-5fb4217df13b/go.mod h1:tNrEB5k8SI+g5kOlsCmL2ELASfpqEofI0+FLBgBdN08=
 github.com/openshift/library-go v0.0.0-20240528110646-354b673304be h1:a59nZ27dqyuuUSIR0i8g7NEEIOaFxfkMLql8Kc0h5Eg=
@@ -501,6 +499,8 @@ github.com/peterbourgon/diskv v2.0.1+incompatible h1:UBdAOUP5p4RWqPBg048CAvpKN+v
 github.com/peterbourgon/diskv v2.0.1+incompatible/go.mod h1:uqqh8zWWbv1HBMNONnaR/tNboyR3/BZd58JJSHlUSCU=
 github.com/petr-muller/api v0.0.0-20240825134317-d07794135bff h1:O0LRn7a4Zf0EvINEcQM0YOek+82/NT7YJ3m771QifeI=
 github.com/petr-muller/api v0.0.0-20240825134317-d07794135bff/go.mod h1:OOh6Qopf21pSzqNVCB5gomomBXb8o5sGKZxG2KNpaXM=
+github.com/petr-muller/openshift-client-go v0.0.0-20240825134747-583f23d043ba h1:NR0K545Waf3x7DThMS2vo2HLxRKWIRBhJkIfp566N+k=
+github.com/petr-muller/openshift-client-go v0.0.0-20240825134747-583f23d043ba/go.mod h1:scfjzxZEifUmaLiPwKhmB7kS31hCOo7fxUYwnW1nFpI=
 github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8 h1:KoWmjvw+nsYOo29YJK9vDA65RGE3NrOnUtO7a+RF9HU=
 github.com/pkg/browser v0.0.0-20210911075715-681adbf594b8/go.mod h1:HKlIX3XHQyzLZPlr7++PzdhaXEj94dEiJgZDTsxEqUI=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
