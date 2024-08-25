@@ -109,7 +109,6 @@ type poolDisplayData struct {
 	Name          string
 	Assessment    assessmentState
 	Completion    float64
-	Duration      time.Duration
 	NodesOverview nodesOverviewDisplayData
 	Nodes         []nodeDisplayData
 }

@@ -5,10 +5,57 @@ metadata:
 spec: {}
 status:
   controlPlane:
-
     informers:
     - name: ota-1268-prototype
       insights:
+      - type: MachineConfigPool
+        mcp:
+          assessment: Pending
+          completion: 0
+          name: "master"
+          resource:
+            apiGroup: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            name: master
+          scopeType: ControlPlane
+          summaries:
+          - type: Total
+            count: 1
+          - type: Available
+            count: 1
+          - type: Progressing
+            count: 0
+          - type: Outdated
+            count: 0
+          - type: Draining
+            count: 0
+          - type: Excluded
+            count: 0
+          - type: Degraded
+            count: 0
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: ip-10-0-8-37.ec2.internal
+          name: ip-10-0-8-37.ec2.internal
+          version: 4.16.0-0.nightly-2024-08-01-082745
+          conditions:
+            - lastTransitionTime: "2024-02-27T12:15:21Z"
+              message: "Node is pending an update"
+              reason: Pending
+              status: "False"
+              type: Updating
+            - lastTransitionTime: "2024-02-27T12:15:21Z"
+              message: "Node is not degraded"
+              reason: "AllIsWell"
+              status: "False"
+              type: Degraded
+            - lastTransitionTime: "2024-02-27T12:15:21Z"
+              message: "Node is available"
+              reason: "AllIsWell"
+              status: "True"
+              type: Available
       - type: ClusterVersion
         cv:
           resource:

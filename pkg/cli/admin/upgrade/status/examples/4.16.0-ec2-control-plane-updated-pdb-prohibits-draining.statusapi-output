@@ -1,6 +1,8 @@
 = Control Plane =
 Update to 4.16.0-ec.3 successfully completed at 2024-02-27T15:42:58Z (duration: 3h31m)
 
+All control plane nodes successfully updated to 4.16.0-ec.3
+
 = Worker Upgrade =
 
 WORKER POOL   ASSESSMENT   COMPLETION   STATUS

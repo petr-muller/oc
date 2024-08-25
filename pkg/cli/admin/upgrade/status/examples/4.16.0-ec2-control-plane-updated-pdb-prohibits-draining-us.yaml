@@ -8,6 +8,100 @@ status:
     informers:
     - name: ota-1268-prototype
       insights:
+      - type: MachineConfigPool
+        mcp:
+          assessment: Completed
+          completion: 100
+          name: "master"
+          resource:
+            apiGroup: machineconfiguration.openshift.io/v1
+            kind: MachineConfigPool
+            name: master
+          scopeType: ControlPlane
+          summaries:
+          - type: Total
+            count: 3
+          - type: Available
+            count: 3
+          - type: Progressing
+            count: 0
+          - type: Outdated
+            count: 0
+          - type: Draining
+            count: 0
+          - type: Excluded
+            count: 0
+          - type: Degraded
+            count: 0
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: build0-gstfj-m-0.c.openshift-ci-build-farm.internal
+          name: build0-gstfj-m-0.c.openshift-ci-build-farm.internal
+          version: 4.16.0-ec.3
+          conditions:
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is updated"
+            reason: Completed
+            status: "False"
+            type: Updating
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is not degraded"
+            reason: "AllIsWell"
+            status: "False"
+            type: Degraded
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is available"
+            reason: "AllIsWell"
+            status: "True"
+            type: Available
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: build0-gstfj-m-1.c.openshift-ci-build-farm.internal
+          name: build0-gstfj-m-1.c.openshift-ci-build-farm.internal
+          version: 4.16.0-ec.3
+          conditions:
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is updated"
+            reason: Completed
+            status: "False"
+            type: Updating
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is not degraded"
+            reason: "AllIsWell"
+            status: "False"
+            type: Degraded
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is available"
+            reason: "AllIsWell"
+            status: "True"
+            type: Available
+      - type: Node
+        node:
+          resource:
+            kind: Node
+            name: build0-gstfj-m-2.c.openshift-ci-build-farm.internal
+          name: build0-gstfj-m-2.c.openshift-ci-build-farm.internal
+          version: 4.16.0-ec.3
+          conditions:
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is updated"
+            reason: Completed
+            status: "False"
+            type: Updating
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is not degraded"
+            reason: "AllIsWell"
+            status: "False"
+            type: Degraded
+          - lastTransitionTime: "2024-02-27T12:15:21Z"
+            message: "Node is available"
+            reason: "AllIsWell"
+            status: "True"
+            type: Available
       - type: ClusterVersion
         cv:
           resource:

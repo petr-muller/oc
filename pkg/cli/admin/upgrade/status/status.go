@@ -453,98 +453,92 @@ func (o *options) Run(ctx context.Context) error {
 						}
 					}
 				}
+				if insight.Type == configv1alpha1.UpdateInsightTypeMachineConfigPoolStatusInsight {
+					mcpInsight := insight.MachineConfigPoolStatusInsight
+					controlPlanePoolStatusData.Name = mcpInsight.Name
+					controlPlanePoolStatusData.Assessment = assessmentState(mcpInsight.Assessment)
+					controlPlanePoolStatusData.Completion = float64(mcpInsight.Completion)
+					for _, summary := range mcpInsight.Summaries {
+						switch summary.Type {
+						case configv1alpha1.PoolNodesSummaryTypeTotal:
+							controlPlanePoolStatusData.NodesOverview.Total = int(summary.Count)
+						case configv1alpha1.PoolNodesSummaryTypeAvailable:
+							controlPlanePoolStatusData.NodesOverview.Available = int(summary.Count)
+						case configv1alpha1.PoolNodesSummaryTypeProgressing:
+							controlPlanePoolStatusData.NodesOverview.Progressing = int(summary.Count)
+						case configv1alpha1.PoolNodesSummaryTypeOutdated:
+							controlPlanePoolStatusData.NodesOverview.Outdated = int(summary.Count)
+						case configv1alpha1.PoolNodesSummaryTypeDraining:
+							controlPlanePoolStatusData.NodesOverview.Draining = int(summary.Count)
+						case configv1alpha1.PoolNodesSummaryTypeExcluded:
+							controlPlanePoolStatusData.NodesOverview.Excluded = int(summary.Count)
+						case configv1alpha1.PoolNodesSummaryTypeDegraded:
+							controlPlanePoolStatusData.NodesOverview.Degraded = int(summary.Count)
+						}
+					}
+				}
+				if insight.Type == configv1alpha1.UpdateInsightTypeNodeStatusInsight {
+					nodeInsight := insight.NodeStatusInsight
+					updating := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeUpdating))
+					available := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeAvailable))
+					degraded := meta.FindStatusCondition(nodeInsight.Conditions, string(configv1alpha1.NodeStatusInsightConditionTypeDegraded))
+
+					ndd := nodeDisplayData{
+						Name:    nodeInsight.Name,
+						Version: nodeInsight.Version,
+						Message: nodeInsight.Message,
+					}
+
+					zeroEst := "?" // unknown
+					if updating != nil && updating.Status == metav1.ConditionTrue {
+						ndd.isUpdating = true
+						ndd.Assessment = nodeAssessmentProgressing
+						switch updating.Reason {
+						case string(configv1alpha1.NodeStatusInsightUpdatingReasonDraining):
+							ndd.Phase = phaseStateDraining
+						case string(configv1alpha1.NodeStatusInsightUpdatingReasonUpdating):
+							ndd.Phase = phaseStateUpdating
+						case string(configv1alpha1.NodeStatusInsightUpdatingReasonRebooting):
+							ndd.Phase = phaseStateRebooting
+						}
+
+					}
+
+					if updating != nil && updating.Status == metav1.ConditionFalse {
+						ndd.isUpdating = false
+						switch updating.Reason {
+						case string(configv1alpha1.NodeStatusInsightUpdatingReasonPaused):
+							ndd.Assessment = nodeAssessmentExcluded
+							ndd.Phase = phaseStatePaused
+							zeroEst = "-"
+						case string(configv1alpha1.NodeStatusInsightUpdatingReasonCompleted):
+							ndd.isUpdated = true
+							ndd.Assessment = nodeAssessmentCompleted
+							zeroEst = "-"
+						case string(configv1alpha1.NodeStatusInsightUpdatingReasonPending):
+							ndd.Assessment = nodeAssessmentOutdated
+							ndd.Phase = phaseStatePending
+						}
+					}
+
+					if available != nil {
+						ndd.isUnavailable = available.Status == metav1.ConditionFalse
+					}
+
+					if degraded != nil {
+						ndd.isDegraded = degraded.Status == metav1.ConditionTrue
+					}
+
+					if nodeInsight.EstToComplete.Duration == 0 || ndd.isDegraded || ndd.isUnavailable {
+						ndd.Estimate = zeroEst
+					} else {
+						ndd.Estimate = "+" + shortDuration(nodeInsight.EstToComplete.Duration)
+					}
+
+					controlPlanePoolStatusData.Nodes = append(controlPlanePoolStatusData.Nodes, ndd)
+				}
 			}
 		}
-
-		// if cpPool := us.Status.ControlPlane.Nodes; cpPool != nil {
-		// 	controlPlanePoolStatusData = poolDisplayData{
-		// 		Name:       cpPool.Resource.Name,
-		// 		Assessment: "",
-		// 		Completion: 0,
-		// 		Duration:   0,
-		// 		NodesOverview: nodesOverviewDisplayData{
-		// 			Total:       0,
-		// 			Available:   0,
-		// 			Progressing: 0,
-		// 			Outdated:    0,
-		// 			Draining:    0,
-		// 			Excluded:    0,
-		// 			Degraded:    0,
-		// 		},
-		// 		Nodes: nil,
-		// 	}
-		// 	for _, node := range cpPool.Nodes {
-		// 		ndd := nodeDisplayData{
-		// 			Name:     node.Resource.Name,
-		// 			Version:  node.Version,
-		// 			Estimate: shortDuration(node.EstToComplete.Duration),
-		// 			Message:  node.Message,
-		// 		}
-		//
-		// 		controlPlanePoolStatusData.NodesOverview.Total++
-		//
-		// 		if node.Conditions != nil {
-		//
-		// 			if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeUpdating); c != nil {
-		// 				if c.Status == metav1.ConditionTrue {
-		// 					ndd.isUpdating = true
-		// 					ndd.Assessment = nodeAssessmentProgressing
-		//
-		// 					switch c.Reason {
-		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonDraining:
-		// 						ndd.Phase = phaseStateDraining
-		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonUpdating:
-		// 						ndd.Phase = phaseStateUpdating
-		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonRebooting:
-		// 						ndd.Phase = phaseStateRebooting
-		// 					}
-		// 				}
-		//
-		// 				if c.Status == metav1.ConditionFalse {
-		// 					ndd.isUpdating = false
-		// 					switch c.Reason {
-		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonPaused:
-		// 						ndd.Assessment = nodeAssessmentExcluded
-		// 						ndd.Phase = phaseStatePaused
-		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonCompleted:
-		// 						ndd.isUpdated = true
-		// 						ndd.Assessment = nodeAssessmentCompleted
-		// 					case configv1alpha1.NodeUpdateStatusUpdatingReasonPending:
-		// 						ndd.Assessment = nodeAssessmentOutdated
-		// 						ndd.Phase = phaseStatePending
-		// 					}
-		// 				}
-		//
-		// 				if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeAvailable); c != nil {
-		// 					ndd.isUnavailable = c.Status == metav1.ConditionFalse
-		// 				}
-		//
-		// 				if c := findCondition(node.Conditions, configv1alpha1.NodeUpdateStatusConditionTypeDegraded); c != nil {
-		// 					ndd.isDegraded = c.Status == metav1.ConditionTrue
-		// 				}
-		//
-		// 				if ndd.Assessment == nodeAssessmentOutdated {
-		// 					controlPlanePoolStatusData.NodesOverview.Outdated++
-		// 				}
-		// 				if ndd.Phase == phaseStateDraining {
-		// 					controlPlanePoolStatusData.NodesOverview.Draining++
-		// 				}
-		// 				if ndd.isUnavailable {
-		// 					ndd.Assessment = nodeAssessmentUnavailable
-		// 				} else {
-		// 					controlPlanePoolStatusData.NodesOverview.Available++
-		// 				}
-		// 				if ndd.isUpdating {
-		// 					controlPlanePoolStatusData.NodesOverview.Progressing++
-		// 				}
-		// 				if ndd.isDegraded {
-		// 					controlPlanePoolStatusData.NodesOverview.Degraded++
-		// 					ndd.Assessment = nodeAssessmentDegraded
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
 	}
 
 	if !controlPlaneUpdating && !isWorkerPoolOutdated {
