@@ -67,7 +67,7 @@ func New(f kcmdutil.Factory, streams genericiooptions.IOStreams) *cobra.Command 
 	flags.StringVar(&o.detailedOutput, "details", "none", fmt.Sprintf("Show detailed output in selected section. One of: %s", strings.Join(detailedOutputAllValues, ", ")))
 
 	flags.StringVar(&o.mockData.updateStatusPath, "mock-updatestatus", "", "Path to a YAML UpdateStatus object to use for testing. Should only be used with --status-api=true.")
-	flags.BoolVar(&o.statusApi, "status-api", true, "Use status API")
+	flags.BoolVar(&o.statusApi, "status-api", false, "Use status API")
 
 	return cmd
 }
